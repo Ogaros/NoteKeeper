@@ -15,7 +15,6 @@ void addNoteWindow::closeEvent(QCloseEvent *event)
 
 void addNoteWindow::setUI()
 {
-    //Testing changes
     //----Widgets creation----------------------------------------------
     dateLabel = new QLabel("Date:");
     selectedDate = new QDateEdit();
