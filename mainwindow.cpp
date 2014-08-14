@@ -93,6 +93,7 @@ void MainWindow::setUI()
 
     this->setStyleSheet("QStatusBar::item { border: 0px solid black }; ");
 
+    createTrayIcon();
 
 }
 
@@ -132,6 +133,20 @@ void MainWindow::createStatusBar()
     statusLabel = new QLabel("No noted dates in the future.");
     sBar->setSizeGripEnabled(false);
     sBar->addWidget(statusLabel);
+}
+
+void MainWindow::createTrayIcon()
+{
+    quitAction = new QAction("Exit", this);
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(quitAction);
+
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+    trayIcon->setToolTip("Organizer");
+    // TODO: Make real icon.
+    trayIcon->setIcon(QIcon("D:\\Programs\\Steam\\graphics\\avatar_32blank.tga"));
+    trayIcon->show();
 }
 
 void MainWindow::moveToCenter(QWidget *window)
@@ -294,10 +309,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
         {
         case QMessageBox::Yes:
             saveNotes();
+            delete notes;
             event->accept();
             qApp->quit();
             break;
         case QMessageBox::No:
+            delete notes;
             event->accept();
             qApp->quit();
             break;
@@ -305,6 +322,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             event->ignore();
             break;
         default:
+            delete notes;
             event->accept();
             qApp->quit();
             break;

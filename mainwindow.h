@@ -36,6 +36,7 @@ public slots:
     int showExitWOSavingMessageBox();
 
 private slots:
+    //void iconActivated(QSystemTrayIcon::ActivationReason);
     void switchButtons();
     void resizeMe();    
 
@@ -47,6 +48,7 @@ private:
     void setUI();
     void moveToCenter(QWidget *);
     void createMenu();
+    void createTrayIcon();
     void createStatusBar();
     bool isChanged;
 
@@ -62,7 +64,11 @@ private:
     QPushButton   *todayButton;
     QPushButton   *quitButton;
     QLabel        *noteText;
-    QLabel        *statusLabel;   
+    QLabel        *statusLabel;
+
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayIconMenu;
+    QAction *quitAction;
 };
 
 #endif // MAINWINDOW_H
