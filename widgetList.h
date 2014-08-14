@@ -23,5 +23,6 @@
 #include <QDialogButtonBox>
 #include <QTimer>
 #include <QMessageBox>
+#include <QSystemTrayIcon>
 
 #endif // WIDGETLIST_H
