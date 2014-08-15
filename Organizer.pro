@@ -16,3 +16,6 @@ SOURCES += \
     note.cpp \
     notebook.cpp \
     editwindow.cpp
+
+RESOURCES += \
+    resources.qrc

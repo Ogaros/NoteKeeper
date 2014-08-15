@@ -145,7 +145,7 @@ void MainWindow::createTrayIcon()
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setToolTip("Organizer");
     // TODO: Make real icon.
-    trayIcon->setIcon(QIcon("D:\\Programs\\Steam\\graphics\\avatar_32blank.tga"));
+    trayIcon->setIcon(QIcon(":/images/icon.tga"));
     trayIcon->show();
 }
 
