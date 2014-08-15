@@ -3,7 +3,7 @@
 
 #include "widgetList.h"
 #include "orgcalendar.h"
-#include "addnotewindow.h"
+#include "editwindow.h"
 #include "note.h"
 #include "notebook.h"
 
@@ -53,7 +53,7 @@ private:
     bool isChanged;
 
     Notebook      *notes;
-    addNoteWindow *addWindow = nullptr;
+    EditWindow *addWindow = nullptr;
     QVBoxLayout   *mainLayout;
     QHBoxLayout   *topLayout;
     QVBoxLayout   *buttonsLayout;

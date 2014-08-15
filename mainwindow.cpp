@@ -20,7 +20,7 @@ void MainWindow::showAddWindow()
     const QDate d = cal->selectedDate();
     if(addWindow == nullptr)
     {
-        addWindow = new addNoteWindow();
+        addWindow = new EditWindow();
         addWindow->loadFields(d, notes->getNoteFromDate(d));
         connect(addWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
         connect(addWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
