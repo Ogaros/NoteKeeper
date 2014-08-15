@@ -137,8 +137,10 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createTrayIcon()
 {
+    openAction = new QAction("Open Organizer", this);
     quitAction = new QAction("Exit", this);
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(openAction);
     trayIconMenu->addAction(quitAction);
 
     trayIcon = new QSystemTrayIcon(this);
@@ -357,4 +359,9 @@ void MainWindow::showClosestNote()
     }
     else
         statusLabel->setText("No noted dates in the future.");
+}
+
+void MainWindow::hideToTray()
+{
+    this->hide();
 }

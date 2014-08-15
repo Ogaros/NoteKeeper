@@ -39,6 +39,7 @@ private slots:
     //void iconActivated(QSystemTrayIcon::ActivationReason);
     void switchButtons();
     void resizeMe();    
+    void hideToTray();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -69,6 +70,7 @@ private:
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
     QAction *quitAction;
+    QAction *openAction;
 };
 
 #endif // MAINWINDOW_H
