@@ -1,14 +1,14 @@
-#ifndef ADDNOTEWINDOW_H
-#define ADDNOTEWINDOW_H
+#ifndef EDITWINDOW_H
+#define EDITWINDOW_H
 
 #include "widgetList.h"
 #include "note.h"
 
-class addNoteWindow : public QWidget
+class EditWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit addNoteWindow(QWidget *parent = 0);
+    explicit EditWindow(QWidget *parent = 0);
     void loadFields(const QDate&, Note*);
     bool isOpened(){return this->isVisible();}
 
@@ -18,6 +18,7 @@ protected:
 signals:
     void noteAdded(Note*, const bool);
     void noteAdded(const QDate&);
+    void cancelled();
 
 public slots:
     void changeDate(const QDate& date);
@@ -26,10 +27,13 @@ public slots:
 
 private slots:
     void hideLayoutItems(const bool on);
+    void cancel();
 
 private:
-    Note *currentNote;
     void setUI();
+    void createNotificationGroupBox();
+
+    Note *currentNote;
     QLabel *dateLabel;
     QDateEdit *selectedDate;
     QLabel *noteTextLabel;
@@ -50,4 +54,4 @@ private:
     QDialogButtonBox *noteAddButtons;
 };
 
-#endif // ADDNOTEWINDOW_H
+#endif // EDITWINDOW_H

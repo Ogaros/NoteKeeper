@@ -1,25 +1,56 @@
-#include "addnotewindow.h"
+#include "editwindow.h"
 
-addNoteWindow::addNoteWindow( QWidget *parent) :
+EditWindow::EditWindow( QWidget *parent) :
     QWidget(parent)
 {
     this->setUI();
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-void addNoteWindow::closeEvent(QCloseEvent *event)
+void EditWindow::closeEvent(QCloseEvent *event)
 {
     event->ignore();
     this->hide();
+    emit cancelled();
 }
 
-void addNoteWindow::setUI()
+void EditWindow::setUI()
 {
-    //----Widgets creation----------------------------------------------
+    mainLayout = new QVBoxLayout;
     dateLabel = new QLabel("Date:");
     selectedDate = new QDateEdit();
     noteTextLabel = new QLabel("Note text:");
     noteText = new QTextEdit;
+
+    noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    selectedDate->setDisplayFormat("dd.MM(MMM).yyyy");
+
+    noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
+                                          QDialogButtonBox::Cancel);
+    connect(noteAddButtons, SIGNAL(rejected()),this, SLOT(cancel()));
+    connect(noteAddButtons, SIGNAL(accepted()),this, SLOT(addNote()));
+
+    errorLabel = new QLabel;
+    errorLabel->setStyleSheet("QLabel { color : red; }");
+
+    createNotificationGroupBox();
+
+    mainLayout->addWidget(dateLabel);
+    mainLayout->addWidget(selectedDate);
+    mainLayout->addWidget(noteTextLabel);
+    mainLayout->addWidget(noteText);
+    mainLayout->addWidget(notifyGroupBox);
+    mainLayout->addWidget(errorLabel);
+    mainLayout->addWidget(noteAddButtons);
+
+    mainLayout->setAlignment(Qt::AlignTop);
+    this->setLayout(mainLayout);
+    noteText->setFocus();
+}
+
+void EditWindow::createNotificationGroupBox()
+{
+    notifyLayout = new QVBoxLayout;
     notifyRButtonGroup = new QButtonGroup;
     notifyGroupBox = new QGroupBox("Notify me in advance");
     notifyRBOnce =  new QRadioButton("Once");
@@ -30,24 +61,11 @@ void addNoteWindow::setUI()
     notifyOnceDate = new QDateTimeEdit();
     notifyRepeatedDate = new QDateEdit();
     notifyRepeatedTime = new QTimeEdit();
-    //------------------------------------------------------------------
 
-    connect(notifyGroupBox, SIGNAL(toggled(bool)), this, SLOT(hideLayoutItems(bool)));
-    noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    //----Layouts creation----------------------------------------------
-    mainLayout = new QVBoxLayout;
-    notifyLayout = new QVBoxLayout;
-    //------------------------------------------------------------------
-
-    //----DateEdits display formats-------------------------------------
-    selectedDate->setDisplayFormat("dd.MM(MMM).yyyy");
     notifyOnceDate->setDisplayFormat("hh:mm AP dd.MM(MMM).yyyy");
     notifyRepeatedDate->setDisplayFormat("dd.MM(MMM).yyyy");
     notifyRepeatedTime->setDisplayFormat("hh:mm AP");
-    //------------------------------------------------------------------
 
-    //----Adding widgets to notification layout--------------------
     notifyLayout->addWidget(notifyRBOnce);
     notifyLayout->addWidget(notifyRBRepeat);
     notifyLayout->addWidget(notifyOnceDateLabel);
@@ -62,61 +80,37 @@ void addNoteWindow::setUI()
     notifyRepeatedTime->hide();
     notifyRepeatedDateLabel->hide();
     notifyRepeatedDate->hide();
+
+    connect(notifyGroupBox, SIGNAL(toggled(bool)), this, SLOT(hideLayoutItems(bool)));
     connect(notifyRBOnce, SIGNAL(toggled(bool)), notifyOnceDateLabel, SLOT(setVisible(bool)));
     connect(notifyRBOnce, SIGNAL(toggled(bool)), notifyOnceDate, SLOT(setVisible(bool)));
     connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedTimeLabel, SLOT(setVisible(bool)));
     connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedTime, SLOT(setVisible(bool)));
     connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedDateLabel, SLOT(setVisible(bool)));
     connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedDate, SLOT(setVisible(bool)));
-    //------------------------------------------------------------------
-
-    //----Resizing window when menu expands-----------------------------
     connect(notifyRBOnce, SIGNAL(toggled(bool)), this, SLOT(resizeMe()));
     connect(notifyRBRepeat, SIGNAL(toggled(bool)), this, SLOT(resizeMe()));
-    //------------------------------------------------------------------
 
-    //----Notification groupbox settings and rbgroupbox buttons adding--
     notifyRButtonGroup->addButton(notifyRBOnce);
     notifyRButtonGroup->addButton(notifyRBRepeat);
     notifyGroupBox->setLayout(notifyLayout);
     notifyGroupBox->setCheckable(true);
     notifyGroupBox->setChecked(false);
-    //------------------------------------------------------------------
-
-    //----Ok/Cancel buttons and their signals connections---------------
-    noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
-                                          QDialogButtonBox::Cancel);
-    connect(noteAddButtons, SIGNAL(rejected()),this, SLOT(hide()));
-    connect(noteAddButtons, SIGNAL(accepted()),this, SLOT(addNote()));
-    //------------------------------------------------------------------
-
-    //----Error label setup---------------------------------------------
-    errorLabel = new QLabel;
-    errorLabel->setStyleSheet("QLabel { color : red; }");
-    //------------------------------------------------------------------
-
-    //----Main layout widgets adding------------------------------------
-    mainLayout->addWidget(dateLabel);
-    mainLayout->addWidget(selectedDate);
-    mainLayout->addWidget(noteTextLabel);
-    mainLayout->addWidget(noteText);
-    mainLayout->addWidget(notifyGroupBox);
-    mainLayout->addWidget(errorLabel);
-    mainLayout->addWidget(noteAddButtons);
-    //------------------------------------------------------------------
-
-    mainLayout->setAlignment(Qt::AlignTop);
-    this->setLayout(mainLayout);
-    noteText->setFocus();
 }
 
-void addNoteWindow::changeDate(const QDate& date)
+void EditWindow::cancel()
+{
+    this->hide();
+    emit cancelled();
+}
+
+void EditWindow::changeDate(const QDate& date)
 {
     selectedDate->setDate(date);
     notifyOnceDate->setDate(date);
 }
 
-void addNoteWindow::hideLayoutItems(const bool on)
+void EditWindow::hideLayoutItems(const bool on)
 {
     if(on)
     {
@@ -141,14 +135,14 @@ void addNoteWindow::hideLayoutItems(const bool on)
     QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
 
-void addNoteWindow::resizeMe()
+void EditWindow::resizeMe()
 {
     this->resize(this->minimumSizeHint());
     noteText->resize(noteText->minimumSize());
     noteText->resize(noteText->sizeHint());
 }
 
-void addNoteWindow::addNote()
+void EditWindow::addNote()
 {
     bool hasErrors = false;
     errorLabel->clear();
@@ -209,7 +203,7 @@ void addNoteWindow::addNote()
     }
 }
 
-void addNoteWindow::loadFields(const QDate& date, Note *n)
+void EditWindow::loadFields(const QDate& date, Note *n)
 {
     currentNote = n;
     errorLabel->hide();
