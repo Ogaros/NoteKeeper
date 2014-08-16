@@ -1,10 +1,10 @@
 #include "mainwindow.h"
 
-static const int windowSizeX = 600;
+static const int windowSizeX = 650;
 static const int windowSizeY = 300;
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), isChanged(false), isClosing(false)
+    QMainWindow(parent), isChanged(false), isClosing(false), editWindow(nullptr)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setFixedSize(this->size());
@@ -42,8 +42,8 @@ void MainWindow::showAddWindow()
 
 void MainWindow::setUI()
 {
-    mainLayout = new QVBoxLayout;
-    topLayout = new QHBoxLayout;
+    mainLayout = new QHBoxLayout;
+    leftLayout = new QVBoxLayout;
 
     this->createMenu();
     this->createStatusBar();
@@ -51,18 +51,30 @@ void MainWindow::setUI()
     this->createButtonLayout();
     this->createTrayIcon();
 
-    topLayout->addWidget(cal);
-    topLayout->addLayout(buttonsLayout);
-    topLayout->setAlignment(Qt::AlignTop);    
+    noteTextTitle = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
+    noteText = new QLabel();
+    noteText->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    noteText->setMargin(5);
+    noteText->hide();
 
-    noteText = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
-    mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(noteText);
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(noteText);
+    scrollArea->setMaximumSize(cal->size());
+    scrollArea->setMinimumSize(cal->size());
+    noteText->setMinimumSize(100,100);
+
+    leftLayout->addWidget(cal);
+    leftLayout->addWidget(noteTextTitle);
+    leftLayout->addWidget(scrollArea);
+
+    mainLayout->addLayout(leftLayout);
+    mainLayout->addLayout(buttonsLayout);
 
     QWidget *window = new QWidget;
     window->setLayout(mainLayout);
     this->setCentralWidget(window);
     this->setMinimumSize(windowSizeX,windowSizeY);
+    this->setMaximumSize(windowSizeX,windowSizeY*2);
     this->setStyleSheet("QStatusBar::item { border: 0px solid black }; ");
     this->switchButtons();
 }
@@ -190,11 +202,12 @@ void MainWindow::showNote()
     QString *text = notes->getTextFromDate(d);
     if(text != nullptr)
     {
-        noteText->setText(d.toString("dddd dd of MMMM yyyy:\n\n")+*text);
+        noteTextTitle->setText(d.toString("dddd dd of MMMM yyyy:"));
+        noteText->setText(*text);
     }
     else
     {
-        noteText->setText("No notes on "+d.toString("dddd dd of MMMM yyyy"));
+        noteTextTitle->setText("No notes on "+d.toString("dddd dd of MMMM yyyy"));
     }
     cal->setFocus();
 
@@ -219,7 +232,10 @@ void MainWindow::switchButtons()
 
 void MainWindow::resizeMe()
 {
-    noteText->show();
+    if(noteTextTitle->text().left(8) != "No notes")
+    {
+        noteText->show();
+    }
     this->resize(this->minimumSizeHint());
 }
 

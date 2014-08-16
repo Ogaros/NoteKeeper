@@ -58,9 +58,9 @@ private:
     bool isClosing;
 
     Notebook      *notes;
-    EditWindow *editWindow = nullptr;
-    QVBoxLayout   *mainLayout;
-    QHBoxLayout   *topLayout;
+    EditWindow    *editWindow;
+    QHBoxLayout   *mainLayout;
+    QVBoxLayout   *leftLayout;
     QVBoxLayout   *buttonsLayout;
     orgCalendar   *cal;
     QPushButton   *addButton;
@@ -68,8 +68,10 @@ private:
     QPushButton   *removeButton;
     QPushButton   *todayButton;
     QPushButton   *quitButton;
+    QLabel        *noteTextTitle;
     QLabel        *noteText;
     QLabel        *statusLabel;
+    QScrollArea   *scrollArea;
 
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
