@@ -18,7 +18,6 @@ protected:
 signals:
     void noteAdded(Note*, const bool);
     void noteAdded(const QDate&);
-    void cancelled();
 
 public slots:
     void changeDate(const QDate& date);
@@ -27,7 +26,6 @@ public slots:
 
 private slots:
     void hideLayoutItems(const bool on);
-    void cancel();
 
 private:
     void setUI();

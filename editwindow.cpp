@@ -11,7 +11,6 @@ void EditWindow::closeEvent(QCloseEvent *event)
 {
     event->ignore();
     this->hide();
-    emit cancelled();
 }
 
 void EditWindow::setUI()
@@ -27,7 +26,7 @@ void EditWindow::setUI()
 
     noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
                                           QDialogButtonBox::Cancel);
-    connect(noteAddButtons, SIGNAL(rejected()),this, SLOT(cancel()));
+    connect(noteAddButtons, SIGNAL(rejected()),this, SLOT(hide()));
     connect(noteAddButtons, SIGNAL(accepted()),this, SLOT(addNote()));
 
     errorLabel = new QLabel;
@@ -96,12 +95,6 @@ void EditWindow::createNotificationGroupBox()
     notifyGroupBox->setLayout(notifyLayout);
     notifyGroupBox->setCheckable(true);
     notifyGroupBox->setChecked(false);
-}
-
-void EditWindow::cancel()
-{
-    this->hide();
-    emit cancelled();
 }
 
 void EditWindow::changeDate(const QDate& date)
