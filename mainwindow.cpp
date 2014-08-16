@@ -4,11 +4,13 @@ static const int windowSizeX = 600;
 static const int windowSizeY = 300;
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), isChanged(false)
+    QMainWindow(parent), isChanged(false), isClosing(false)
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setFixedSize(this->size());
     notes = new Notebook(this);
     this->setUI();
+    setWindowFlags(this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     MainWindow::moveToCenter(this);
     showNote();
     showClosestNote();
@@ -18,23 +20,23 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::showAddWindow()
 {
     const QDate d = cal->selectedDate();
-    if(addWindow == nullptr)
+    if(editWindow == nullptr)
     {
-        addWindow = new EditWindow();
-        addWindow->loadFields(d, notes->getNoteFromDate(d));
-        connect(addWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
-        connect(addWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
-        connect(addWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNote()));
-        connect(addWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
-        connect(addWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
-        addWindow->show();
-        MainWindow::moveToCenter(addWindow);
+        editWindow = new EditWindow();
+        editWindow->loadFields(d, notes->getNoteFromDate(d));
+        connect(editWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
+        connect(editWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
+        connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNote()));
+        connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
+        connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
+        editWindow->show();
+        MainWindow::moveToCenter(editWindow);
     }
     else
     {
-        addWindow->loadFields(d, notes->getNoteFromDate(d));
-        QTimer::singleShot(1, addWindow, SLOT(resizeMe()));
-        addWindow->show();
+        editWindow->loadFields(d, notes->getNoteFromDate(d));
+        QTimer::singleShot(1, editWindow, SLOT(resizeMe()));
+        editWindow->show();
     }
 }
 
@@ -42,59 +44,27 @@ void MainWindow::setUI()
 {
     mainLayout = new QVBoxLayout;
     topLayout = new QHBoxLayout;
-    buttonsLayout = new QVBoxLayout();
-    cal = new orgCalendar(notes);
-    addButton = new QPushButton("Add note");
-    editButton = new QPushButton("Edit note");
-    removeButton = new QPushButton("Remove note");
-    todayButton = new QPushButton("Go to current date");
-    quitButton = new QPushButton("Quit");
-    noteText = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
-
-    connect(cal, SIGNAL(selectionChanged()), this, SLOT(switchButtons()));
-    connect(cal, SIGNAL(selectionChanged()), this, SLOT(showNote()));
 
     this->createMenu();
     this->createStatusBar();
+    this->createCalendar();
+    this->createButtonLayout();
+    this->createTrayIcon();
 
     topLayout->addWidget(cal);
     topLayout->addLayout(buttonsLayout);
-    topLayout->setAlignment(Qt::AlignTop);
+    topLayout->setAlignment(Qt::AlignTop);    
 
-    buttonsLayout->addWidget(addButton);
-    buttonsLayout->addWidget(editButton);
-    buttonsLayout->addWidget(removeButton);
-    buttonsLayout->addWidget(todayButton);
-    buttonsLayout->addWidget(quitButton);
-    buttonsLayout->setAlignment(Qt::AlignTop);
-
-    cal->setMinimumSize(500, 250);
-    cal->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-    switchButtons();
-
+    noteText = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
     mainLayout->addLayout(topLayout);
     mainLayout->addWidget(noteText);
 
-
-    connect(addButton, SIGNAL(clicked()), this, SLOT(showAddWindow()));
-    connect(editButton, SIGNAL(clicked()), this, SLOT(showAddWindow()));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(deleteNode()));
-    connect(todayButton, SIGNAL(clicked()), cal, SLOT(showToday()));
-    connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
-
-
     QWidget *window = new QWidget;
-
     window->setLayout(mainLayout);
     this->setCentralWidget(window);
-
     this->setMinimumSize(windowSizeX,windowSizeY);
-
     this->setStyleSheet("QStatusBar::item { border: 0px solid black }; ");
-
-    createTrayIcon();
-
+    this->switchButtons();
 }
 
 void MainWindow::createMenu()
@@ -109,12 +79,10 @@ void MainWindow::createMenu()
     fileActions.append(new QAction("Export notes...",this));
     fileActions.append(new QAction("Delete outdated notes",this));
     fileActions.append(new QAction("Delete all notes",this));
-    fileActions.append(new QAction("Exit",this));
 
     connect(fileActions.front(), SIGNAL(triggered()), this, SLOT(saveNotes()));
     connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
     connect(fileActions.at(4), SIGNAL(triggered()), this, SLOT(deleteAll()));
-    connect(fileActions.back(), SIGNAL(triggered()),this, SLOT(close()));
 
     fileMenu->addActions(fileActions);
 
@@ -124,7 +92,6 @@ void MainWindow::createMenu()
     connect(this, SIGNAL(noteDeleted()), this, SLOT(showClosestNote()));
 
     menu->show();
-
 }
 
 void MainWindow::createStatusBar()
@@ -133,22 +100,61 @@ void MainWindow::createStatusBar()
     statusLabel = new QLabel("No noted dates in the future.");
     sBar->setSizeGripEnabled(false);
     sBar->addWidget(statusLabel);
+    sBar->setSizeGripEnabled(false);
 }
 
 void MainWindow::createTrayIcon()
 {
     openAction = new QAction("Open Organizer", this);
     quitAction = new QAction("Exit", this);
+
     trayIconMenu = new QMenu(this);
     trayIconMenu->addAction(openAction);
     trayIconMenu->addAction(quitAction);
 
+    connect(openAction, SIGNAL(triggered()), this, SLOT(showFromTray()));
+    openAction->setEnabled(false);
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(closeProgram()));
+
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setToolTip("Organizer");
+
     // TODO: Make real icon.
     trayIcon->setIcon(QIcon(":/images/icon.tga"));
     trayIcon->show();
+}
+
+void MainWindow::createButtonLayout()
+{
+    buttonsLayout = new QVBoxLayout();
+    addButton = new QPushButton("Add note");
+    editButton = new QPushButton("Edit note");
+    removeButton = new QPushButton("Remove note");
+    todayButton = new QPushButton("Go to current date");
+    quitButton = new QPushButton("Close");
+
+    connect(addButton, SIGNAL(clicked()), this, SLOT(showAddWindow()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(showAddWindow()));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(deleteNode()));
+    connect(todayButton, SIGNAL(clicked()), cal, SLOT(showToday()));
+    connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
+
+    buttonsLayout->addWidget(addButton);
+    buttonsLayout->addWidget(editButton);
+    buttonsLayout->addWidget(removeButton);
+    buttonsLayout->addWidget(todayButton);
+    buttonsLayout->addWidget(quitButton);
+    buttonsLayout->setAlignment(Qt::AlignTop);
+}
+
+void MainWindow::createCalendar()
+{
+    cal = new orgCalendar(notes);
+    cal->setMinimumSize(500, 250);
+    cal->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    connect(cal, SIGNAL(selectionChanged()), this, SLOT(switchButtons()));
+    connect(cal, SIGNAL(selectionChanged()), this, SLOT(showNote()));
 }
 
 void MainWindow::moveToCenter(QWidget *window)
@@ -193,7 +199,6 @@ void MainWindow::showNote()
     cal->setFocus();
 
     QTimer::singleShot(1, this, SLOT(resizeMe()));
-
 }
 
 void MainWindow::switchButtons()
@@ -216,7 +221,6 @@ void MainWindow::resizeMe()
 {
     noteText->show();
     this->resize(this->minimumSizeHint());
-
 }
 
 void MainWindow::saveNotes()
@@ -304,37 +308,50 @@ int MainWindow::showExitWOSavingMessageBox()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(isChanged)
+    if(isClosing)
     {
-        int i = showExitWOSavingMessageBox();
-        switch(i)
+        if(isChanged)
         {
-        case QMessageBox::Yes:
-            saveNotes();
+            int i = showExitWOSavingMessageBox();
+            switch(i)
+            {
+            case QMessageBox::Yes:
+                saveNotes();
+                delete notes;
+                event->accept();
+                qApp->quit();
+                break;
+            case QMessageBox::No:
+                delete notes;
+                event->accept();
+                qApp->quit();
+                break;
+            case QMessageBox::Cancel:
+                event->ignore();
+                break;
+            default:
+                delete notes;
+                event->accept();
+                qApp->quit();
+                break;
+            }
+        }
+        else
+        {
             delete notes;
             event->accept();
             qApp->quit();
-            break;
-        case QMessageBox::No:
-            delete notes;
-            event->accept();
-            qApp->quit();
-            break;
-        case QMessageBox::Cancel:
-            event->ignore();
-            break;
-        default:
-            delete notes;
-            event->accept();
-            qApp->quit();
-            break;
         }
     }
     else
     {
-        delete notes;
-        event->accept();
-        qApp->quit();
+        event->ignore();
+        if(editWindow != nullptr)
+        {
+            editWindow->close();
+        }
+        this->hide();
+        openAction->setEnabled(true);
     }
 }
 
@@ -361,7 +378,15 @@ void MainWindow::showClosestNote()
         statusLabel->setText("No noted dates in the future.");
 }
 
-void MainWindow::hideToTray()
+void MainWindow::closeProgram()
 {
-    this->hide();
+    isClosing = true;
+    this->close();
+}
+
+void MainWindow::showFromTray()
+{
+    this->show();
+    cal->setFocus();
+    openAction->setEnabled(false);
 }

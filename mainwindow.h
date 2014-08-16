@@ -39,7 +39,8 @@ private slots:
     //void iconActivated(QSystemTrayIcon::ActivationReason);
     void switchButtons();
     void resizeMe();    
-    void hideToTray();
+    void closeProgram();
+    void showFromTray();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -51,10 +52,13 @@ private:
     void createMenu();
     void createTrayIcon();
     void createStatusBar();
+    void createButtonLayout();
+    void createCalendar();
     bool isChanged;
+    bool isClosing;
 
     Notebook      *notes;
-    EditWindow *addWindow = nullptr;
+    EditWindow *editWindow = nullptr;
     QVBoxLayout   *mainLayout;
     QHBoxLayout   *topLayout;
     QVBoxLayout   *buttonsLayout;
