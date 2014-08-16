@@ -24,5 +24,6 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
+#include <QScrollArea>
 
 #endif // WIDGETLIST_H
