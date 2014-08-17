@@ -36,11 +36,11 @@ public slots:
     int showExitWOSavingMessageBox();
 
 private slots:
-    //void iconActivated(QSystemTrayIcon::ActivationReason);
     void switchButtons();
     void resizeMe();    
     void closeProgram();
     void showFromTray();
+    void iconActivated(QSystemTrayIcon::ActivationReason);
 
 protected:
     void closeEvent(QCloseEvent *event);

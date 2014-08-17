@@ -57,15 +57,15 @@ void MainWindow::setUI()
     noteText->setMargin(5);
     noteText->hide();
 
-    scrollArea = new QScrollArea;
-    scrollArea->setWidget(noteText);
-    scrollArea->setMaximumSize(cal->size());
-    scrollArea->setMinimumSize(cal->size());
-    noteText->setMinimumSize(100,100);
+//    scrollArea = new QScrollArea;
+//    scrollArea->setWidget(noteText);
+//    scrollArea->setMaximumSize(cal->size());
+//    scrollArea->setMinimumSize(cal->size());
+//    noteText->setMinimumSize(100,100);
 
     leftLayout->addWidget(cal);
     leftLayout->addWidget(noteTextTitle);
-    leftLayout->addWidget(scrollArea);
+    leftLayout->addWidget(noteText);
 
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(buttonsLayout);
@@ -129,6 +129,7 @@ void MainWindow::createTrayIcon()
     connect(quitAction, SIGNAL(triggered()), this, SLOT(closeProgram()));
 
     trayIcon = new QSystemTrayIcon(this);
+    connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setToolTip("Organizer");
 
@@ -405,4 +406,23 @@ void MainWindow::showFromTray()
     this->show();
     cal->setFocus();
     openAction->setEnabled(false);
+}
+
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch(reason)
+    {
+    case QSystemTrayIcon::Trigger:
+        if(this->isVisible())
+        {
+            this->close();
+        }
+        else
+        {
+            this->showFromTray();
+        }
+        break;
+    default:
+        break;
+    }
 }
