@@ -9,6 +9,7 @@
 class Notebook
 {
 public:
+    //TODO: remove parent from here
     Notebook(QWidget *parent);
     ~Notebook();
     void loadNotes();
