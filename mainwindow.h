@@ -57,7 +57,7 @@ private:
     void createCalendar();
     bool isChanged;
     bool isClosing;
-
+//TODO: change notes to smart pointer
     Notebook      *notes;
     EditWindow    *editWindow;
     QHBoxLayout   *mainLayout;

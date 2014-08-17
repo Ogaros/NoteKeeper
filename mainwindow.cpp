@@ -369,7 +369,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
         this->hide();
         openAction->setEnabled(true);
-        showTrayMessage(QDate::currentDate().addDays(-10));
+        //Temporary
+        showTrayMessage(QDate::currentDate().addDays(10));
     }
 }
 
@@ -430,5 +431,6 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::showTrayMessage(const QDate& date)
 {
-    trayIcon->showMessage(date.toString("dd/MM/yyyy")+" (in "+QString::number(static_cast<ulong>(date.daysTo(QDate::currentDate())))+" days):", "*notes->getTextFromDate(date)");
+    trayIcon->showMessage(date.toString("dd/MM/yyyy")+" (in "+QString::number(static_cast<ulong>(QDate::currentDate().daysTo(date)))+" days):",
+                          "*notes->getTextFromDate(date)");
 }
