@@ -1,9 +1,9 @@
 #include "orgcalendar.h"
 
-orgCalendar::orgCalendar(Notebook *notes,QWidget *parent) :
+orgCalendar::orgCalendar(std::weak_ptr<Notebook> notes,QWidget *parent) :
     QCalendarWidget(parent)
 {
-    this->notes = notes;
+    this->notes = notes.lock();
     this->setFirstDayOfWeek(Qt::Monday);
     this->setGridVisible(true);
     this->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);

@@ -4,18 +4,19 @@
 #include <QCalendarWidget>
 #include <QPainter>
 #include "notebook.h"
+#include "memory"
 
 class orgCalendar : public QCalendarWidget
 {
     Q_OBJECT
 public:
-    explicit orgCalendar(Notebook*, QWidget *parent = 0);
+    explicit orgCalendar(const std::weak_ptr<Notebook>, QWidget *parent = 0);
 
 protected:
     void paintCell(QPainter * painter, const QRect & rect, const QDate & date) const;
 
 private:
-    Notebook *notes;
+    std::shared_ptr<Notebook> notes;
 
 signals:
 
