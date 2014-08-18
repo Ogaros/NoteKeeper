@@ -6,15 +6,15 @@ static const int windowSizeY = 300;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), isChanged(false), isClosing(false), editWindow(nullptr)
 {
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setFixedSize(this->size());
-    notes = new Notebook(this);
+    try
+    {
+        notes = std::make_shared<Notebook>(new Notebook);
+    }
+    catch(std::exception& e)
+    {
+        QMessageBox::critical(parent, "Notebook::loadNotes", QString::fromLocal8Bit(e.what()));
+    }
     this->setUI();
-    setWindowFlags(this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-    MainWindow::moveToCenter(this);
-    showNote();
-    showClosestNote();
-    connect(this, SIGNAL(noteDeleted()), this, SLOT(switchButtons()));
 }
 
 void MainWindow::showAddWindow()
@@ -73,10 +73,17 @@ void MainWindow::setUI()
     QWidget *window = new QWidget;
     window->setLayout(mainLayout);
     this->setCentralWidget(window);
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    this->setFixedSize(this->size());
+    this->setWindowFlags(this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    MainWindow::moveToCenter(this);
     this->setMinimumSize(windowSizeX,windowSizeY);
     this->setMaximumSize(windowSizeX,windowSizeY*2);
     this->setStyleSheet("QStatusBar::item { border: 0px solid black }; ");
     this->switchButtons();
+    this->showNote();
+    this->showClosestNote();
+    connect(this, SIGNAL(noteDeleted()), this, SLOT(switchButtons()));
 }
 
 void MainWindow::createMenu()
@@ -184,14 +191,26 @@ void MainWindow::addNote(Note *n, const bool isNew)
 {
     if(isNew)
     {
-        if(notes->addNote(n) == false)
+        try
         {
-            QMessageBox::critical(this, "MainWindow::addNote", "Null pointer passed as an argument");
+            notes->addNote(n);
+        }
+        catch(std::exception& e)
+        {
+            QMessageBox::critical(this, "Notebook::addNote", QString::fromLocal8Bit(e.what()));
         }
     }
     else
     {
-        notes->sort();
+        try
+        {
+            notes->sort();
+        }
+        catch(std::exception& e)
+        {
+            QMessageBox::critical(this, "Notebook::sort", QString::fromLocal8Bit(e.what()));
+            qApp->quit();
+        }
     }
     isChanged = true;
 }
@@ -242,7 +261,14 @@ void MainWindow::resizeMe()
 
 void MainWindow::saveNotes()
 {
-    notes->saveNotes();
+    try
+    {
+        notes->saveNotes();
+    }
+    catch(std::exception& e)
+    {
+        QMessageBox::critical(this, "Notebook::loadNotes", QString::fromLocal8Bit(e.what()));
+    }
     isChanged = false;
 }
 
@@ -334,28 +360,24 @@ void MainWindow::closeEvent(QCloseEvent *event)
             {
             case QMessageBox::Yes:
                 saveNotes();
-                delete notes;
                 event->accept();
                 qApp->quit();
                 break;
             case QMessageBox::No:
-                delete notes;
                 event->accept();
                 qApp->quit();
                 break;
             case QMessageBox::Cancel:
+                isClosing = false;
                 event->ignore();
+                this->showFromTray();
                 break;
             default:
-                delete notes;
-                event->accept();
-                qApp->quit();
                 break;
             }
         }
         else
         {
-            delete notes;
             event->accept();
             qApp->quit();
         }

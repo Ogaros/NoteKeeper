@@ -6,6 +6,7 @@
 #include "editwindow.h"
 #include "note.h"
 #include "notebook.h"
+#include "memory"
 
 enum DeleteOption
 {
@@ -57,27 +58,26 @@ private:
     void createCalendar();
     bool isChanged;
     bool isClosing;
-//TODO: change notes to smart pointer
-    Notebook      *notes;
-    EditWindow    *editWindow;
-    QHBoxLayout   *mainLayout;
-    QVBoxLayout   *leftLayout;
-    QVBoxLayout   *buttonsLayout;
-    orgCalendar   *cal;
-    QPushButton   *addButton;
-    QPushButton   *editButton;
-    QPushButton   *removeButton;
-    QPushButton   *todayButton;
-    QPushButton   *quitButton;
-    QLabel        *noteTextTitle;
-    QLabel        *noteText;
-    QLabel        *statusLabel;
-    QScrollArea   *scrollArea;
 
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
-    QAction *quitAction;
-    QAction *openAction;
+    std::shared_ptr<Notebook>       notes;
+    EditWindow                      *editWindow;
+    QHBoxLayout                     *mainLayout;
+    QVBoxLayout                     *leftLayout;
+    QVBoxLayout                     *buttonsLayout;
+    orgCalendar                     *cal;
+    QPushButton                     *addButton;
+    QPushButton                     *editButton;
+    QPushButton                     *removeButton;
+    QPushButton                     *todayButton;
+    QPushButton                     *quitButton;
+    QLabel                          *noteTextTitle;
+    QLabel                          *noteText;
+    QLabel                          *statusLabel;
+    QScrollArea                     *scrollArea;
+    QSystemTrayIcon                 *trayIcon;
+    QMenu                           *trayIconMenu;
+    QAction                         *quitAction;
+    QAction                         *openAction;
 };
 
 #endif // MAINWINDOW_H
