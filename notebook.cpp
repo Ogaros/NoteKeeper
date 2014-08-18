@@ -1,8 +1,15 @@
 #include "notebook.h"
 
-Notebook::Notebook(QWidget *parent) : parent(parent)
+Notebook::Notebook()
 {
-    loadNotes();
+    try
+    {
+        loadNotes();
+    }
+    catch(...)
+    {
+        throw;
+    }
 }
 
 Notebook::~Notebook()
@@ -15,9 +22,14 @@ bool Notebook::addNote(Note *n)
     if(n == nullptr)
         return false;
     notes.append(n);
-    sort();
-
-
+    try
+    {
+        sort();
+    }
+    catch(...)
+    {
+        throw;
+    }
     return true;
 }
 bool Notebook::addNote(const QDate nDate, const QString nText)
@@ -38,7 +50,7 @@ void Notebook::loadNotes()
     if(!file.exists())
         return;
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        QMessageBox::critical(this->parent, "Notebook::loadNotes", "Failed to open OrgNotes.xml");
+        throw std::exception("Failed to open OrgNotes.xml");
     QXmlStreamReader xml(&file);
 
     while (!xml.atEnd() && !xml.hasError())
@@ -57,7 +69,7 @@ void Notebook::loadNotes()
         }
     }
     if(xml.hasError())
-        QMessageBox::critical(this->parent, "Notebook::loadNotes", xml.errorString());
+        throw std::exception(xml.errorString().toLocal8Bit());
     file.close();
 }
 
@@ -111,17 +123,15 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
         }
         xml.readNext();
     }
-
     n = new Note(nDate, nText, notifDate, notifTime, isRepeated);
     return n;
-
 }
 
 void Notebook::saveNotes() const
 {
     QFile file("OrgNotes.xml");
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        QMessageBox::critical(this->parent, "Notebook::saveNotes", "Failed to open OrgNotes.xml");
+        throw std::exception("Failed to open OrgNotes.xml");
     QXmlStreamWriter xml(&file);
     xml.setAutoFormatting(true);
 
@@ -152,10 +162,9 @@ void Notebook::sort()
     {
         qSort(notes.begin(), notes.end(), ptrLess());
     }
-    catch(std::exception e)
+    catch(...)
     {
-        QMessageBox::critical(parent, "Notebook::sort", QString::fromLocal8Bit(e.what()));
-        qApp->quit();
+        throw;
     }
 }
 

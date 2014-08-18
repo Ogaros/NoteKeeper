@@ -9,8 +9,8 @@
 class Notebook
 {
 public:
-    //TODO: remove parent from here
-    Notebook(QWidget *parent);
+    Notebook();
+    Notebook(Notebook*){loadNotes();}
     ~Notebook();
     void loadNotes();
     void saveNotes() const;
@@ -29,7 +29,6 @@ public:
 
 
 private:
-    QWidget *parent;
     QList<Note*> notes;
     Note* parseNote(QXmlStreamReader&) const;
 };
