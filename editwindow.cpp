@@ -44,6 +44,7 @@ void EditWindow::setUI()
 
     mainLayout->setAlignment(Qt::AlignTop);
     this->setLayout(mainLayout);
+    this->setWindowIcon(QIcon(":/images/icon.tga"));
     noteText->setFocus();
 }
 

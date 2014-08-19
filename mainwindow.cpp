@@ -83,6 +83,7 @@ void MainWindow::setUI()
     this->switchButtons();
     this->showNote();
     this->showClosestNote();
+    this->setWindowIcon(QIcon(":/images/icon.tga"));
     connect(this, SIGNAL(noteDeleted()), this, SLOT(switchButtons()));
 }
 
