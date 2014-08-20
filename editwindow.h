@@ -26,30 +26,38 @@ public slots:
 
 private slots:
     void hideLayoutItems(const bool on);
+    void showRepeatGroupBoxContent(const bool on);
 
 private:
     void setUI();
     void createNotificationGroupBox();
+    void createRepeatGroupBox();
 
-    Note *currentNote;
-    QLabel *dateLabel;
-    QDateEdit *selectedDate;
-    QLabel *noteTextLabel;
-    QLabel *errorLabel;
-    QTextEdit *noteText;
-    QButtonGroup *notifyRButtonGroup;
-    QGroupBox *notifyGroupBox;
-    QRadioButton *notifyRBOnce;
-    QLabel *notifyOnceDateLabel;
-    QDateTimeEdit *notifyOnceDate;
-    QRadioButton *notifyRBRepeat;
-    QDateEdit *notifyRepeatedDate;
-    QLabel *notifyRepeatedDateLabel;
-    QLabel *notifyRepeatedTimeLabel;
-    QTimeEdit *notifyRepeatedTime;
-    QVBoxLayout *mainLayout;
-    QVBoxLayout *notifyLayout;
-    QDialogButtonBox *noteAddButtons;
+    Note                *currentNote;
+    QLabel              *dateLabel;
+    QDateEdit           *selectedDate;
+    QLabel              *noteTextLabel;
+    QLabel              *errorLabel;
+    QTextEdit           *noteText;
+    QButtonGroup        *notifyRButtonGroup;
+    QGroupBox           *notifyGroupBox;
+    QGroupBox           *repeatGroupBox;
+    QVBoxLayout         *repeatLayout;
+    QButtonGroup        *repeatRadioButtonGroup;
+    QRadioButton        *repeatWeekRadioButton;
+    QRadioButton        *repeatMonthRadioButton;
+    QRadioButton        *repeatYearRadioButton;
+    QRadioButton        *notifyRBOnce;
+    QLabel              *notifyOnceDateLabel;
+    QDateTimeEdit       *notifyOnceDate;
+    QRadioButton        *notifyRBRepeat;
+    QDateEdit           *notifyRepeatedDate;
+    QLabel              *notifyRepeatedDateLabel;
+    QLabel              *notifyRepeatedTimeLabel;
+    QTimeEdit           *notifyRepeatedTime;
+    QVBoxLayout         *mainLayout;
+    QVBoxLayout         *notifyLayout;
+    QDialogButtonBox    *noteAddButtons;
 };
 
 #endif // EDITWINDOW_H

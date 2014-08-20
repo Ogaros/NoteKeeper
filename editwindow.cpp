@@ -32,12 +32,14 @@ void EditWindow::setUI()
     errorLabel = new QLabel;
     errorLabel->setStyleSheet("QLabel { color : red; }");
 
+    createRepeatGroupBox();
     createNotificationGroupBox();
 
     mainLayout->addWidget(dateLabel);
     mainLayout->addWidget(selectedDate);
     mainLayout->addWidget(noteTextLabel);
     mainLayout->addWidget(noteText);
+    mainLayout->addWidget(repeatGroupBox);
     mainLayout->addWidget(notifyGroupBox);
     mainLayout->addWidget(errorLabel);
     mainLayout->addWidget(noteAddButtons);
@@ -98,6 +100,33 @@ void EditWindow::createNotificationGroupBox()
     notifyGroupBox->setChecked(false);
 }
 
+void EditWindow::createRepeatGroupBox()
+{
+    repeatLayout = new QVBoxLayout;
+    repeatRadioButtonGroup = new QButtonGroup;
+    repeatGroupBox = new QGroupBox("Repeat this note");
+    repeatWeekRadioButton =  new QRadioButton("Every week");
+    repeatMonthRadioButton =  new QRadioButton("Every month");
+    repeatYearRadioButton =  new QRadioButton("Every year");
+
+    repeatRadioButtonGroup->addButton(repeatWeekRadioButton);
+    repeatRadioButtonGroup->addButton(repeatMonthRadioButton);
+    repeatRadioButtonGroup->addButton(repeatYearRadioButton);
+
+    repeatLayout->addWidget(repeatWeekRadioButton);
+    repeatLayout->addWidget(repeatMonthRadioButton);
+    repeatLayout->addWidget(repeatYearRadioButton);
+
+    repeatWeekRadioButton->hide();
+    repeatMonthRadioButton->hide();
+    repeatYearRadioButton->hide();
+
+    repeatGroupBox->setLayout(repeatLayout);
+    repeatGroupBox->setCheckable(true);
+    repeatGroupBox->setChecked(false);
+    connect(repeatGroupBox, SIGNAL(toggled(const bool)), this, SLOT(showRepeatGroupBoxContent(const bool)));
+}
+
 void EditWindow::changeDate(const QDate& date)
 {
     selectedDate->setDate(date);
@@ -126,6 +155,14 @@ void EditWindow::hideLayoutItems(const bool on)
         notifyRepeatedDateLabel->hide();
         notifyRepeatedDate->hide();
     }
+    QTimer::singleShot(1, this, SLOT(resizeMe()));
+}
+
+void EditWindow::showRepeatGroupBoxContent(const bool on)
+{
+    repeatWeekRadioButton->setVisible(on);
+    repeatMonthRadioButton->setVisible(on);
+    repeatYearRadioButton->setVisible(on);
     QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
 
