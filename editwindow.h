@@ -3,6 +3,7 @@
 
 #include "widgetList.h"
 #include "note.h"
+#include "QRegExpValidator"
 
 class EditWindow : public QWidget
 {
@@ -27,11 +28,13 @@ public slots:
 private slots:
     void hideLayoutItems(const bool on);
     void showRepeatGroupBoxContent(const bool on);
+    void showNotificationGroupBoxContent(const bool on);
 
 private:
     void setUI();
-    void createNotificationGroupBox();
+    void createNotificationGroupBoxx();
     void createRepeatGroupBox();
+    void createNotificationGroupBox();
 
     Note                *currentNote;
     QLabel              *dateLabel;
@@ -39,14 +42,18 @@ private:
     QLabel              *noteTextLabel;
     QLabel              *errorLabel;
     QTextEdit           *noteText;
-    QButtonGroup        *notifyRButtonGroup;
-    QGroupBox           *notifyGroupBox;
     QGroupBox           *repeatGroupBox;
     QVBoxLayout         *repeatLayout;
     QButtonGroup        *repeatRadioButtonGroup;
     QRadioButton        *repeatWeekRadioButton;
     QRadioButton        *repeatMonthRadioButton;
     QRadioButton        *repeatYearRadioButton;
+    QGroupBox           *notificationGroupBox;
+    QVBoxLayout         *notificationLayout;
+    QLineEdit           *notificationLineEdit;
+    //QLabel              *notification;
+    QButtonGroup        *notifyRButtonGroup;
+    QGroupBox           *notifyGroupBox;
     QRadioButton        *notifyRBOnce;
     QLabel              *notifyOnceDateLabel;
     QDateTimeEdit       *notifyOnceDate;

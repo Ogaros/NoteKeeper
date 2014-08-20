@@ -22,6 +22,7 @@ void EditWindow::setUI()
     noteText = new QTextEdit;
 
     noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    noteText->setPlaceholderText("Type in the note text here");
     selectedDate->setDisplayFormat("dd.MM(MMM).yyyy");
 
     noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
@@ -33,6 +34,7 @@ void EditWindow::setUI()
     errorLabel->setStyleSheet("QLabel { color : red; }");
 
     createRepeatGroupBox();
+    createNotificationGroupBoxx();
     createNotificationGroupBox();
 
     mainLayout->addWidget(dateLabel);
@@ -40,7 +42,7 @@ void EditWindow::setUI()
     mainLayout->addWidget(noteTextLabel);
     mainLayout->addWidget(noteText);
     mainLayout->addWidget(repeatGroupBox);
-    mainLayout->addWidget(notifyGroupBox);
+    mainLayout->addWidget(notificationGroupBox);
     mainLayout->addWidget(errorLabel);
     mainLayout->addWidget(noteAddButtons);
 
@@ -50,7 +52,7 @@ void EditWindow::setUI()
     noteText->setFocus();
 }
 
-void EditWindow::createNotificationGroupBox()
+void EditWindow::createNotificationGroupBoxx()
 {
     notifyLayout = new QVBoxLayout;
     notifyRButtonGroup = new QButtonGroup;
@@ -127,6 +129,25 @@ void EditWindow::createRepeatGroupBox()
     connect(repeatGroupBox, SIGNAL(toggled(const bool)), this, SLOT(showRepeatGroupBoxContent(const bool)));
 }
 
+void EditWindow::createNotificationGroupBox()
+{
+    notificationLayout = new QVBoxLayout;
+    notificationGroupBox = new QGroupBox("Notify me in adavnce");
+    notificationLineEdit = new QLineEdit;
+    QRegExpValidator *daysValidator = new QRegExpValidator(QRegExp("\\d+"));
+
+    notificationLayout->addWidget(notificationLineEdit);
+
+    notificationLineEdit->setPlaceholderText("Amount of days");
+    notificationLineEdit->setValidator(daysValidator);
+    notificationLineEdit->hide();
+
+    notificationGroupBox->setLayout(notificationLayout);
+    notificationGroupBox->setCheckable(true);
+    notificationGroupBox->setChecked(false);
+    connect(notificationGroupBox, SIGNAL(toggled(const bool)), this, SLOT(showNotificationGroupBoxContent(const bool)));
+}
+
 void EditWindow::changeDate(const QDate& date)
 {
     selectedDate->setDate(date);
@@ -163,6 +184,12 @@ void EditWindow::showRepeatGroupBoxContent(const bool on)
     repeatWeekRadioButton->setVisible(on);
     repeatMonthRadioButton->setVisible(on);
     repeatYearRadioButton->setVisible(on);
+    QTimer::singleShot(1, this, SLOT(resizeMe()));
+}
+
+void EditWindow::showNotificationGroupBoxContent(const bool on)
+{
+    notificationLineEdit->setVisible(on);
     QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
 
@@ -207,6 +234,11 @@ void EditWindow::addNote()
             errorLabel->setText(errorLabel->text() + "\n*You should pick either repeated or one time notification.");
             hasErrors = true;
         }
+    }
+    if(notificationGroupBox->isChecked() && !notificationLineEdit->hasAcceptableInput())
+    {
+        errorLabel->setText(errorLabel->text() + "\n*You should add the number of days for notification.");
+        hasErrors = true;
     }
     if(hasErrors)
     {
