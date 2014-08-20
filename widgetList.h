@@ -25,5 +25,6 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QScrollArea>
+#include <QLineEdit>
 
 #endif // WIDGETLIST_H
