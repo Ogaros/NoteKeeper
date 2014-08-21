@@ -51,7 +51,11 @@ private:
     QGroupBox           *notificationGroupBox;
     QVBoxLayout         *notificationLayout;
     QLineEdit           *notificationLineEdit;
-    //QLabel              *notification;
+    QLabel              *notificationTopLabel;
+    QRadioButton        *notificationTodayRadioButton;
+    QRadioButton        *notificationDaysRadioButton;
+    QButtonGroup        *notificationRadioButtonGroup;
+    //Deprecated
     QButtonGroup        *notifyRButtonGroup;
     QGroupBox           *notifyGroupBox;
     QRadioButton        *notifyRBOnce;
@@ -62,6 +66,7 @@ private:
     QLabel              *notifyRepeatedDateLabel;
     QLabel              *notifyRepeatedTimeLabel;
     QTimeEdit           *notifyRepeatedTime;
+    //
     QVBoxLayout         *mainLayout;
     QVBoxLayout         *notifyLayout;
     QDialogButtonBox    *noteAddButtons;

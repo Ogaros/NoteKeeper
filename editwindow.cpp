@@ -133,19 +133,35 @@ void EditWindow::createNotificationGroupBox()
 {
     notificationLayout = new QVBoxLayout;
     notificationGroupBox = new QGroupBox("Notify me in adavnce");
+    notificationTopLabel = new QLabel("Starting:");
+    notificationTodayRadioButton = new QRadioButton("Today");
+    notificationDaysRadioButton = new QRadioButton("Amount of days prior to date");
     notificationLineEdit = new QLineEdit;
+    notificationRadioButtonGroup = new QButtonGroup;
     QRegExpValidator *daysValidator = new QRegExpValidator(QRegExp("\\d+"));
 
+    notificationLayout->addWidget(notificationTopLabel);
+    notificationLayout->addWidget(notificationTodayRadioButton);
+    notificationLayout->addWidget(notificationDaysRadioButton);
     notificationLayout->addWidget(notificationLineEdit);
+
+    notificationRadioButtonGroup->addButton(notificationTodayRadioButton);
+    notificationRadioButtonGroup->addButton(notificationDaysRadioButton);
 
     notificationLineEdit->setPlaceholderText("Amount of days");
     notificationLineEdit->setValidator(daysValidator);
+    notificationLineEdit->setEnabled(false);
+
+    notificationTopLabel->hide();
+    notificationTodayRadioButton->hide();
+    notificationDaysRadioButton->hide();
     notificationLineEdit->hide();
 
     notificationGroupBox->setLayout(notificationLayout);
     notificationGroupBox->setCheckable(true);
     notificationGroupBox->setChecked(false);
     connect(notificationGroupBox, SIGNAL(toggled(const bool)), this, SLOT(showNotificationGroupBoxContent(const bool)));
+    connect(notificationDaysRadioButton, SIGNAL(toggled(bool)), notificationLineEdit, SLOT(setEnabled(bool)));
 }
 
 void EditWindow::changeDate(const QDate& date)
@@ -189,6 +205,9 @@ void EditWindow::showRepeatGroupBoxContent(const bool on)
 
 void EditWindow::showNotificationGroupBoxContent(const bool on)
 {
+    notificationTopLabel->setVisible(on);
+    notificationTodayRadioButton->setVisible(on);
+    notificationDaysRadioButton->setVisible(on);
     notificationLineEdit->setVisible(on);
     QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
