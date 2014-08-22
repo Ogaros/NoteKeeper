@@ -26,13 +26,12 @@ public slots:
     void addNote();
 
 private slots:
-    void hideLayoutItems(const bool on);
+    void notificationDaysTextChange(const QString);
     void showRepeatGroupBoxContent(const bool on);
     void showNotificationGroupBoxContent(const bool on);
 
 private:
     void setUI();
-    void createNotificationGroupBoxx();
     void createRepeatGroupBox();
     void createNotificationGroupBox();
 
@@ -55,20 +54,7 @@ private:
     QRadioButton        *notificationTodayRadioButton;
     QRadioButton        *notificationDaysRadioButton;
     QButtonGroup        *notificationRadioButtonGroup;
-    //Deprecated
-    QButtonGroup        *notifyRButtonGroup;
-    QGroupBox           *notifyGroupBox;
-    QRadioButton        *notifyRBOnce;
-    QLabel              *notifyOnceDateLabel;
-    QDateTimeEdit       *notifyOnceDate;
-    QRadioButton        *notifyRBRepeat;
-    QDateEdit           *notifyRepeatedDate;
-    QLabel              *notifyRepeatedDateLabel;
-    QLabel              *notifyRepeatedTimeLabel;
-    QTimeEdit           *notifyRepeatedTime;
-    //
     QVBoxLayout         *mainLayout;
-    QVBoxLayout         *notifyLayout;
     QDialogButtonBox    *noteAddButtons;
 };
 

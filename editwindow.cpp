@@ -34,7 +34,6 @@ void EditWindow::setUI()
     errorLabel->setStyleSheet("QLabel { color : red; }");
 
     createRepeatGroupBox();
-    createNotificationGroupBoxx();
     createNotificationGroupBox();
 
     mainLayout->addWidget(dateLabel);
@@ -50,56 +49,6 @@ void EditWindow::setUI()
     this->setLayout(mainLayout);
     this->setWindowIcon(QIcon(":/images/icon.tga"));
     noteText->setFocus();
-}
-
-void EditWindow::createNotificationGroupBoxx()
-{
-    notifyLayout = new QVBoxLayout;
-    notifyRButtonGroup = new QButtonGroup;
-    notifyGroupBox = new QGroupBox("Notify me in advance");
-    notifyRBOnce =  new QRadioButton("Once");
-    notifyRBRepeat =  new QRadioButton("Every day");
-    notifyOnceDateLabel = new QLabel("At:");
-    notifyRepeatedDateLabel = new QLabel("Starting at this date:");
-    notifyRepeatedTimeLabel = new QLabel("At:");
-    notifyOnceDate = new QDateTimeEdit();
-    notifyRepeatedDate = new QDateEdit();
-    notifyRepeatedTime = new QTimeEdit();
-
-    notifyOnceDate->setDisplayFormat("hh:mm AP dd.MM(MMM).yyyy");
-    notifyRepeatedDate->setDisplayFormat("dd.MM(MMM).yyyy");
-    notifyRepeatedTime->setDisplayFormat("hh:mm AP");
-
-    notifyLayout->addWidget(notifyRBOnce);
-    notifyLayout->addWidget(notifyRBRepeat);
-    notifyLayout->addWidget(notifyOnceDateLabel);
-    notifyLayout->addWidget(notifyOnceDate);
-    notifyLayout->addWidget(notifyRepeatedTimeLabel);
-    notifyLayout->addWidget(notifyRepeatedTime);
-    notifyLayout->addWidget(notifyRepeatedDateLabel);
-    notifyLayout->addWidget(notifyRepeatedDate);
-    notifyOnceDateLabel->hide();
-    notifyOnceDate->hide();
-    notifyRepeatedTimeLabel->hide();
-    notifyRepeatedTime->hide();
-    notifyRepeatedDateLabel->hide();
-    notifyRepeatedDate->hide();
-
-    connect(notifyGroupBox, SIGNAL(toggled(bool)), this, SLOT(hideLayoutItems(bool)));
-    connect(notifyRBOnce, SIGNAL(toggled(bool)), notifyOnceDateLabel, SLOT(setVisible(bool)));
-    connect(notifyRBOnce, SIGNAL(toggled(bool)), notifyOnceDate, SLOT(setVisible(bool)));
-    connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedTimeLabel, SLOT(setVisible(bool)));
-    connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedTime, SLOT(setVisible(bool)));
-    connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedDateLabel, SLOT(setVisible(bool)));
-    connect(notifyRBRepeat, SIGNAL(toggled(bool)), notifyRepeatedDate, SLOT(setVisible(bool)));
-    connect(notifyRBOnce, SIGNAL(toggled(bool)), this, SLOT(resizeMe()));
-    connect(notifyRBRepeat, SIGNAL(toggled(bool)), this, SLOT(resizeMe()));
-
-    notifyRButtonGroup->addButton(notifyRBOnce);
-    notifyRButtonGroup->addButton(notifyRBRepeat);
-    notifyGroupBox->setLayout(notifyLayout);
-    notifyGroupBox->setCheckable(true);
-    notifyGroupBox->setChecked(false);
 }
 
 void EditWindow::createRepeatGroupBox()
@@ -160,39 +109,14 @@ void EditWindow::createNotificationGroupBox()
     notificationGroupBox->setLayout(notificationLayout);
     notificationGroupBox->setCheckable(true);
     notificationGroupBox->setChecked(false);
-    connect(notificationGroupBox, SIGNAL(toggled(const bool)), this, SLOT(showNotificationGroupBoxContent(const bool)));
+    connect(notificationGroupBox, SIGNAL(toggled(bool)), this, SLOT(showNotificationGroupBoxContent(bool)));
     connect(notificationDaysRadioButton, SIGNAL(toggled(bool)), notificationLineEdit, SLOT(setEnabled(bool)));
+    connect(notificationLineEdit, SIGNAL(textChanged(QString)), this, SLOT(notificationDaysTextChange(QString)));
 }
 
 void EditWindow::changeDate(const QDate& date)
 {
     selectedDate->setDate(date);
-    notifyOnceDate->setDate(date);
-}
-
-void EditWindow::hideLayoutItems(const bool on)
-{
-    if(on)
-    {
-        notifyRBOnce->show();
-        notifyRBRepeat->show();
-    }
-    else
-    {
-        notifyRButtonGroup->setExclusive(false);
-        notifyRBOnce->setChecked(false);
-        notifyRBRepeat->setChecked(false);
-        notifyRButtonGroup->setExclusive(true);
-        notifyRBOnce->hide();
-        notifyRBRepeat->hide();
-        notifyOnceDateLabel->hide();
-        notifyOnceDate->hide();
-        notifyRepeatedTimeLabel->hide();
-        notifyRepeatedTime->hide();
-        notifyRepeatedDateLabel->hide();
-        notifyRepeatedDate->hide();
-    }
-    QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
 
 void EditWindow::showRepeatGroupBoxContent(const bool on)
@@ -223,46 +147,63 @@ void EditWindow::addNote()
 {
     bool hasErrors = false;
     errorLabel->clear();
-    QDate nDate = selectedDate->date();
-    QString nText = noteText->toPlainText();
-    if(nText.size() == 0)
+    QDate date = selectedDate->date();
+    QString text = noteText->toPlainText();
+    if(text.size() == 0)
     {
-        errorLabel->setText(errorLabel->text() + "\n*Please add some text to the note.");
+        errorLabel->setText(errorLabel->text() + "\n*Please add some text to the note.\n");
         hasErrors = true;
     }
-    bool hasNotification = false;
-    bool isRepeated;
-    QDate notifDate;
-    QTime notifTime;
-    if(hasNotification = notifyGroupBox->isChecked())
+    nFrequency frequency = nFrequency::Once;
+    if(repeatGroupBox->isChecked())
     {
-        if(notifyRBRepeat->isChecked())
+        if(repeatWeekRadioButton->isChecked())
         {
-            isRepeated = true;
-            notifDate = notifyRepeatedDate->date();
-            notifTime = notifyRepeatedTime->time();
+            frequency = nFrequency::Week;
         }
-        else if(notifyRBOnce->isChecked())
+        else if(repeatMonthRadioButton->isChecked())
         {
-            isRepeated = false;
-            notifDate = notifyOnceDate->date();
-            notifTime = notifyOnceDate->time();
+            frequency = nFrequency::Month;
+        }
+        else if(repeatYearRadioButton->isChecked())
+        {
+            frequency = nFrequency::Year;
         }
         else
         {
-            errorLabel->setText(errorLabel->text() + "\n*You should pick either repeated or one time notification.");
+            errorLabel->setText(errorLabel->text() + "\n*You should pick when to repeat this note.\n");
             hasErrors = true;
         }
     }
-    if(notificationGroupBox->isChecked() && !notificationLineEdit->hasAcceptableInput())
+    bool notifEnabled = false;
+    QDate startDate = QDate::currentDate();
+    if(notificationGroupBox->isChecked())
     {
-        errorLabel->setText(errorLabel->text() + "\n*You should add the number of days for notification.");
-        hasErrors = true;
+        notifEnabled = true;
+        if(!notificationTodayRadioButton->isChecked() && !notificationDaysRadioButton->isChecked())
+        {
+            errorLabel->setText(errorLabel->text() + "\n*You should select when to start notifying you\n about this note.\n");
+            hasErrors = true;
+        }
+        else if(notificationDaysRadioButton->isChecked())
+        {
+            if(!notificationLineEdit->hasAcceptableInput())
+            {
+                errorLabel->setText(errorLabel->text() + "\n*You should add the number of days for notification.\n");
+                hasErrors = true;
+            }
+            else
+            {
+                startDate = date.addDays(-notificationLineEdit->text().toInt());
+            }
+        }
+
     }
     if(hasErrors)
     {
         errorLabel->setText(errorLabel->text().trimmed());
         errorLabel->show();
+        QTimer::singleShot(1, this, SLOT(resizeMe()));
     }
     else
     {
@@ -272,15 +213,13 @@ void EditWindow::addNote()
         {
             n = new Note();
         }
-        n->nDate = nDate;
-        n->nText = nText;
-        if(n->isNotified = hasNotification)
-        {
-            n->notifDate = notifDate;
-            n->notifTime = notifTime;
-        }
+        n->date = date;
+        n->text = text;
+        n->frequency = frequency;
+        n->notifEnabled = notifEnabled;
+        n->startDate = startDate;
         emit noteAdded(n, isNew);
-        emit noteAdded(n->nDate);
+        emit noteAdded(n->date);
         this->hide();
     }
 }
@@ -293,48 +232,84 @@ void EditWindow::loadFields(const QDate& date, Note *n)
     {
         this->setWindowTitle("Add a new note");
         selectedDate->setDate(date);
-        notifyOnceDate->setDate(date);
-        notifyRepeatedDate->setDate(date);
-        notifyGroupBox->setChecked(false);
-        notifyRButtonGroup->setExclusive(false);
-        notifyRBOnce->setChecked(false);
-        notifyRBRepeat->setChecked(false);
-        notifyRButtonGroup->setExclusive(true);
-
         noteText->clear();
+        repeatGroupBox->setChecked(false);
+        repeatRadioButtonGroup->setExclusive(false);
+        repeatWeekRadioButton->setChecked(false);
+        repeatMonthRadioButton->setChecked(false);
+        repeatYearRadioButton->setChecked(false);
+        repeatRadioButtonGroup->setExclusive(true);
+        notificationGroupBox->setChecked(false);
+        notificationRadioButtonGroup->setExclusive(false);
+        notificationTodayRadioButton->setChecked(false);
+        notificationDaysRadioButton->setChecked(false);
+        notificationRadioButtonGroup->setExclusive(true);
+        notificationLineEdit->clear();
     }
     else
     {
         this->setWindowTitle("Edit note");
-        selectedDate->setDate(n->nDate);
-        noteText->setText(n->nText);
-        if(n->isNotified)
+        selectedDate->setDate(n->date);
+        noteText->setText(n->text);
+        if(n->frequency != nFrequency::Once)
         {
-            notifyGroupBox->setChecked(true);
-            if(n->isRepeated)
+            repeatGroupBox->setChecked(true);
+            switch(n->frequency)
             {
-                notifyRBRepeat->setChecked(true);
-                notifyRBOnce->setChecked(false);
-                notifyRepeatedDate->setDate(n->notifDate);
-                notifyRepeatedTime->setTime(n->notifTime);
-            }
-            else
-            {
-                notifyRBRepeat->setChecked(false);
-                notifyRBOnce->setChecked(true);
-                notifyOnceDate->setDate(n->notifDate);
-                notifyOnceDate->setTime(n->notifTime);
+            case nFrequency::Week:
+                repeatWeekRadioButton->setChecked(true);
+                break;
+            case nFrequency::Month:
+                repeatMonthRadioButton->setChecked(true);
+                break;
+            case nFrequency::Year:
+                repeatYearRadioButton->setChecked(true);
+                break;
             }
         }
         else
         {
-            notifyGroupBox->setChecked(false);
-            notifyRButtonGroup->setExclusive(false);
-            notifyRBOnce->setChecked(false);
-            notifyRBRepeat->setChecked(false);
-            notifyRButtonGroup->setExclusive(true);
-            notifyOnceDate->setDate(date);
-            notifyRepeatedDate->setDate(date);
+            repeatGroupBox->setChecked(false);
+            repeatRadioButtonGroup->setExclusive(false);
+            repeatWeekRadioButton->setChecked(false);
+            repeatMonthRadioButton->setChecked(false);
+            repeatYearRadioButton->setChecked(false);
+            repeatRadioButtonGroup->setExclusive(true);
         }
+        if(n->notifEnabled)
+        {
+            notificationGroupBox->setChecked(true);
+            if(n->startDate == QDate::currentDate())
+            {
+                notificationTodayRadioButton->setChecked(true);
+                notificationLineEdit->clear();
+            }
+            else
+            {
+                notificationDaysRadioButton->setChecked(true);
+                notificationLineEdit->setText(QString::number(n->startDate.daysTo(n->date)));
+            }
+        }
+        else
+        {
+            notificationGroupBox->setChecked(false);
+            notificationRadioButtonGroup->setExclusive(false);
+            notificationTodayRadioButton->setChecked(false);
+            notificationDaysRadioButton->setChecked(false);
+            notificationRadioButtonGroup->setExclusive(true);
+            notificationLineEdit->clear();
+        }
+    }
+}
+
+void EditWindow::notificationDaysTextChange(const QString days)
+{
+    if(days.size() == 0)
+    {
+        notificationDaysRadioButton->setText("Amount of days prior to date");
+    }
+    else
+    {
+        notificationDaysRadioButton->setText(days + " days prior to date " + selectedDate->date().addDays(-days.toInt()).toString("(dd/MM/yyyy)"));
     }
 }

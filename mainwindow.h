@@ -8,13 +8,7 @@
 #include "notebook.h"
 #include "memory"
 
-enum DeleteOption
-{
-    One,
-    Outdated,
-    All
-};
-
+enum class DeleteOption{One, Outdated, All};
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

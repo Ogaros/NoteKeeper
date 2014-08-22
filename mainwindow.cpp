@@ -403,8 +403,8 @@ void MainWindow::showClosestNote()
     Note *n = notes->findClosest(QDate::currentDate());
     if(n != nullptr)
     {
-        QString statusText = "Closest noted date" + n->nDate.toString("(dd/MM/yyyy): ");
-        QString noteTextTrimmed = n->nText.trimmed();
+        QString statusText = "Closest noted date" + n->date.toString("(dd/MM/yyyy): ");
+        QString noteTextTrimmed = n->text.trimmed();
         QString noteTextLine = noteTextTrimmed.section('\n',0,0);
         if(noteTextLine.size() > noteTextPieceSize || noteTextTrimmed.size() > noteTextLine.size())
         {

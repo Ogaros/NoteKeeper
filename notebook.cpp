@@ -32,15 +32,10 @@ bool Notebook::addNote(Note *n)
     }
     return true;
 }
-bool Notebook::addNote(const QDate nDate, const QString nText)
+bool Notebook::addNote(const QDate date, const QString text, const nFrequency frequency,
+                       const bool notifEnabled, const QDate startDate)
 {
-    Note *n = new Note(nDate, nText);
-    return addNote(n);
-}
-bool Notebook::addNote(const QDate nDate, const QString nText, const QDate notifDate,
-                       const QTime notifTime, const  bool isRepeated)
-{
-    Note *n = new Note(nDate, nText, notifDate, notifTime, isRepeated);
+    Note *n = new Note(date, text, frequency, notifEnabled, startDate);
     return addNote(n);
 }
 
@@ -76,15 +71,15 @@ void Notebook::loadNotes()
 Note* Notebook::parseNote(QXmlStreamReader &xml) const
 {
     Note *n = nullptr;
-    QDate nDate;
-    QString nText;
-    QDate notifDate;
-    QTime notifTime;
-    bool isNotified;
-    bool isRepeated;
+    QDate date;
+    QString text;
+    nFrequency frequency;
+    bool notifEnabled;
+    QDate startDate;
+
     QXmlStreamAttributes attributes = xml.attributes();
     if(attributes.hasAttribute("date"))
-        nDate = QDate::fromString(attributes.value("date").toString(),"dd/MM/yyyy");
+        date = QDate::fromString(attributes.value("date").toString(),"dd/MM/yyyy");
     xml.readNext();
     while(xml.tokenType() != QXmlStreamReader::EndElement || xml.name() != "note")
     {
@@ -93,37 +88,27 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
             if(xml.name() == "text")
             {
                 xml.readNext();
-                nText = xml.text().toString();
+                text = xml.text().toString();
             }
-            else if(xml.name() == "notify")
+            else if(xml.name() == "frequency")
             {
                 xml.readNext();
-                isNotified = xml.text().toInt();
-                if(!isNotified)
-                {
-                    n = new Note(nDate, nText);
-                    return n;
-                }
+                frequency = static_cast<nFrequency>(xml.text().toInt());
             }
-            else if(xml.name() == "repeated")
+            else if(xml.name() == "notifEnabled")
             {
                 xml.readNext();
-                isRepeated = xml.text().toInt();
+                notifEnabled = xml.text().toInt();
             }
-            else if(xml.name() == "notifDate")
+            else if(xml.name() == "startDate")
             {
                 xml.readNext();
-                notifDate = QDate::fromString(xml.text().toString(),"dd/MM/yyyy");
-            }
-            else if(xml.name() == "notifTime")
-            {
-                xml.readNext();
-                notifTime = QTime::fromString(xml.text().toString(),"hh:mm AP");
+                startDate = QDate::fromString(xml.text().toString(),"dd/MM/yyyy");
             }
         }
         xml.readNext();
     }
-    n = new Note(nDate, nText, notifDate, notifTime, isRepeated);
+    n = new Note(date, text, frequency, notifEnabled, startDate);
     return n;
 }
 
@@ -141,12 +126,11 @@ void Notebook::saveNotes() const
     for (Note *n : notes)
     {
         xml.writeStartElement("note");
-        xml.writeAttribute("date",n->nDate.toString("dd/MM/yyyy"));
-        xml.writeTextElement("text",n->nText);
-        xml.writeTextElement("notify",QString::number(n->isNotified));
-        xml.writeTextElement("repeated",QString::number(n->isRepeated));
-        xml.writeTextElement("notifDate",n->notifDate.toString("dd/MM/yyyy"));
-        xml.writeTextElement("notifTime",n->notifTime.toString("hh:mm AP"));
+        xml.writeAttribute("date",n->date.toString("dd/MM/yyyy"));
+        xml.writeTextElement("text",n->text);
+        xml.writeTextElement("frequency",QString::number(static_cast<int>(n->frequency)));
+        xml.writeTextElement("notifEnabled",QString::number(n->notifEnabled));
+        xml.writeTextElement("startDate",n->startDate.toString("dd/MM/yyyy"));
         xml.writeEndElement();
     }
 
@@ -172,9 +156,9 @@ QString* Notebook::getTextFromDate(const QDate &date) const
 {
     for(auto note : notes)
     {
-        if(note->nDate == date)
-            return &(note->nText);
-        if(note->nDate > date)
+        if(note->date == date)
+            return &(note->text);
+        if(note->date > date)
             break;
     }
     return nullptr;
@@ -184,9 +168,9 @@ Note* Notebook::getNoteFromDate(const QDate &date) const
 {
     for(auto note : notes)
     {
-        if(note->nDate == date)
+        if(note->date == date)
             return note;
-        if(note->nDate > date)
+        if(note->date > date)
             break;
     }
     return nullptr;
@@ -195,7 +179,7 @@ Note* Notebook::getNoteFromDate(const QDate &date) const
 bool Notebook::contains(const QDate &date) const
 {
     for (auto note : notes)
-        if(note->nDate == date)
+        if(note->date == date)
             return true;
     return false;
 }
@@ -222,7 +206,7 @@ int Notebook::deleteOutdated(const QDate &date)
     int deleted = 0;
     for(auto iNote = notes.begin(); iNote != notes.end(); iNote++)
     {
-        if((*iNote)->nDate < date)
+        if((*iNote)->date < date)
         {
             delete *iNote;
             notes.erase(iNote);
@@ -238,7 +222,7 @@ Note* Notebook::findClosest(const QDate &date) const
 {
     for(auto note : notes)
     {
-        if(note->nDate > date)
+        if(note->date > date)
             return note;
     }
     return nullptr;
