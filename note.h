@@ -2,23 +2,24 @@
 #define NOTE_H
 #include "widgetList.h"
 
+enum class nFrequency {Once, Week, Month, Year};
 class Note
 {
 public:
     Note(){}
-    Note(const QDate nDate, const QString nText);
-    Note(const QDate nDate, const QString nText, const QDate notifDate,
-         const QTime notifTime, const bool isRepeated);
+    Note(const QDate date, const QString text, const nFrequency frequency,
+         const bool notifEnabled, const QDate startDate);
 
     bool operator <(const Note& other) const
     {
-        return this->nDate < other.nDate;
+        return this->date < other.date;
     }
 
-    QString nText;
-    QDate nDate, notifDate;
-    QTime notifTime;
-    bool isNotified, isRepeated;
+    QDate date;
+    QString text;
+    nFrequency frequency;
+    bool notifEnabled;
+    QDate startDate;
 };
 
 #endif // NOTE_H
