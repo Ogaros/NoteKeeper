@@ -34,12 +34,15 @@ private:
     void setUI();
     void createRepeatGroupBox();
     void createNotificationGroupBox();
+    void fillNoteSelector();
 
     Note                *currentNote;
+    QVBoxLayout         *mainLayout;
     QLabel              *dateLabel;
     QDateEdit           *selectedDate;
-    QLabel              *noteTextLabel;
-    QLabel              *errorLabel;
+    QLabel              *noteSelectorLabel;
+    QComboBox           *noteSelectorComboBox;
+    QLabel              *noteTextLabel;    
     QTextEdit           *noteText;
     QGroupBox           *repeatGroupBox;
     QVBoxLayout         *repeatLayout;
@@ -54,7 +57,7 @@ private:
     QRadioButton        *notificationTodayRadioButton;
     QRadioButton        *notificationDaysRadioButton;
     QButtonGroup        *notificationRadioButtonGroup;
-    QVBoxLayout         *mainLayout;
+    QLabel              *errorLabel;
     QDialogButtonBox    *noteAddButtons;
 };
 

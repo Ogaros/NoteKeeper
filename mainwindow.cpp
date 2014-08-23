@@ -15,29 +15,33 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::critical(parent, "Notebook::loadNotes", QString::fromLocal8Bit(e.what()));
     }
     this->setUI();
+    createEditWindow();
 }
 
-void MainWindow::showAddWindow()
+void MainWindow::showEditWindow()
 {
     const QDate d = cal->selectedDate();
-    if(editWindow == nullptr)
+    if(QObject::sender() == addButton)
     {
-        editWindow = new EditWindow();
-        editWindow->loadFields(d, notes->getNoteFromDate(d));
-        connect(editWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
-        connect(editWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
-        connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNote()));
-        connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
-        connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
-        editWindow->show();
-        MainWindow::moveToCenter(editWindow);
+        editWindow->loadFields(d, nullptr);
     }
-    else
+    else if(QObject::sender() == editButton)
     {
         editWindow->loadFields(d, notes->getNoteFromDate(d));
-        QTimer::singleShot(1, editWindow, SLOT(resizeMe()));
-        editWindow->show();
     }
+    QTimer::singleShot(1, editWindow, SLOT(resizeMe()));
+    editWindow->show();
+    MainWindow::moveToCenter(editWindow);
+}
+
+void MainWindow::createEditWindow()
+{
+    editWindow = new EditWindow();
+    connect(editWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
+    connect(editWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
+    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNote()));
+    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
+    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
 }
 
 void MainWindow::setUI()
@@ -50,22 +54,16 @@ void MainWindow::setUI()
     this->createCalendar();
     this->createButtonLayout();
     this->createTrayIcon();
+    this->createScrollArea();
 
     noteTextTitle = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
     noteText = new QLabel();
-    noteText->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     noteText->setMargin(5);
     noteText->hide();
 
-//    scrollArea = new QScrollArea;
-//    scrollArea->setWidget(noteText);
-//    scrollArea->setMaximumSize(cal->size());
-//    scrollArea->setMinimumSize(cal->size());
-//    noteText->setMinimumSize(100,100);
-
     leftLayout->addWidget(cal);
     leftLayout->addWidget(noteTextTitle);
-    leftLayout->addWidget(noteText);
+    leftLayout->addWidget(scrollArea);
 
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(buttonsLayout);
@@ -155,8 +153,8 @@ void MainWindow::createButtonLayout()
     todayButton = new QPushButton("Go to current date");
     quitButton = new QPushButton("Close");
 
-    connect(addButton, SIGNAL(clicked()), this, SLOT(showAddWindow()));
-    connect(editButton, SIGNAL(clicked()), this, SLOT(showAddWindow()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(showEditWindow()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(showEditWindow()));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(deleteNode()));
     connect(todayButton, SIGNAL(clicked()), cal, SLOT(showToday()));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
@@ -167,6 +165,23 @@ void MainWindow::createButtonLayout()
     buttonsLayout->addWidget(todayButton);
     buttonsLayout->addWidget(quitButton);
     buttonsLayout->setAlignment(Qt::AlignTop);
+}
+
+void MainWindow::createScrollArea()
+{
+    scrollArea = new QScrollArea;
+    QWidget *scrollWidget = new QWidget;
+    scrollLayout = new QVBoxLayout;
+    scrollWidget->setLayout(scrollLayout);
+    scrollArea->setWidget(scrollWidget);
+    scrollArea->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    scrollArea->setFixedWidth(cal->minimumWidth());
+    scrollArea->setMaximumHeight(500);
+    scrollArea->setMinimumHeight(0);
+    scrollArea->setFixedHeight(200);
+    scrollArea->setWidgetResizable(true);
+    scrollLayout->setAlignment(Qt::AlignTop);
+    scrollArea->hide();
 }
 
 void MainWindow::createCalendar()
@@ -239,13 +254,11 @@ void MainWindow::switchButtons()
 {
     if(notes->contains(cal->selectedDate()))
     {
-        addButton->hide();
         editButton->show();
         removeButton->show();
     }
     else
     {
-        addButton->show();
         editButton->hide();
         removeButton->hide();
     }

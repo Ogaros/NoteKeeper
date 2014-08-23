@@ -19,7 +19,7 @@ signals:
     void noteDeleted();
 
 public slots:
-    void showAddWindow();
+    void showEditWindow();
     void addNote(Note *n, const bool);
     void showNote();
     void showClosestNote();
@@ -50,6 +50,8 @@ private:
     void createStatusBar();
     void createButtonLayout();
     void createCalendar();
+    void createScrollArea();
+    void createEditWindow();
     bool isChanged;
     bool isClosing;
 
@@ -66,8 +68,9 @@ private:
     QPushButton                     *quitButton;
     QLabel                          *noteTextTitle;
     QLabel                          *noteText;
-    QLabel                          *statusLabel;
     QScrollArea                     *scrollArea;
+    QVBoxLayout                     *scrollLayout;
+    QLabel                          *statusLabel;
     QSystemTrayIcon                 *trayIcon;
     QMenu                           *trayIconMenu;
     QAction                         *quitAction;
