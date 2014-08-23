@@ -26,5 +26,6 @@
 #include <QSystemTrayIcon>
 #include <QScrollArea>
 #include <QLineEdit>
+#include <QComboBox>
 
 #endif // WIDGETLIST_H
