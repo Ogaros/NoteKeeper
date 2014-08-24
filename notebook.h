@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+#include "memory"
 
 class Notebook
 {
@@ -21,7 +22,7 @@ public:
     int deleteOutdated(const QDate&);
     int deleteAll();
     QString* getTextFromDate(const QDate&) const;
-    Note* getNoteFromDate(const QDate&) const;
+    std::unique_ptr<QList<Note*>> getNotesFromDate(const QDate&) const;
     Note* findClosest(const QDate&) const;
     bool contains (const QDate&) const;
     void sort();

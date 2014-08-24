@@ -164,16 +164,17 @@ QString* Notebook::getTextFromDate(const QDate &date) const
     return nullptr;
 }
 
-Note* Notebook::getNoteFromDate(const QDate &date) const
+std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate &date) const
 {
+    std::unique_ptr<QList<Note*>> list(new QList<Note*>);
     for(auto note : notes)
     {
         if(note->date == date)
-            return note;
-        if(note->date > date)
-            break;
+        {
+            list->append(note);
+        }
     }
-    return nullptr;
+    return list;
 }
 
 bool Notebook::contains(const QDate &date) const
