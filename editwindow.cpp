@@ -224,6 +224,11 @@ void EditWindow::addNote()
     }
 }
 
+void EditWindow::loadNotes(const QDate &, std::unique_ptr<QList<Note *> >)
+{
+
+}
+
 void EditWindow::loadFields(const QDate& date, Note *n)
 {
     currentNote = n;

@@ -4,6 +4,7 @@
 #include "widgetList.h"
 #include "note.h"
 #include "QRegExpValidator"
+#include "memory"
 
 class EditWindow : public QWidget
 {
@@ -11,6 +12,7 @@ class EditWindow : public QWidget
 public:
     explicit EditWindow(QWidget *parent = 0);
     void loadFields(const QDate&, Note*);
+    void loadNotes(const QDate&, std::unique_ptr<QList<Note*>>);
     bool isOpened(){return this->isVisible();}
 
 protected:
