@@ -27,7 +27,7 @@ void MainWindow::showEditWindow()
     }
     else if(QObject::sender() == editButton)
     {
-        editWindow->loadFields(d, notes->getNoteFromDate(d));
+        editWindow->loadNotes(d, notes->getNotesFromDate(d));
     }
     QTimer::singleShot(1, editWindow, SLOT(resizeMe()));
     editWindow->show();
@@ -39,7 +39,7 @@ void MainWindow::createEditWindow()
     editWindow = new EditWindow();
     connect(editWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
     connect(editWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
-    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNote()));
+    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNotes()));
     connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
     connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
 }
@@ -57,9 +57,6 @@ void MainWindow::setUI()
     this->createScrollArea();
 
     noteTextTitle = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
-    noteText = new QLabel();
-    noteText->setMargin(5);
-    noteText->hide();
 
     leftLayout->addWidget(cal);
     leftLayout->addWidget(noteTextTitle);
@@ -79,7 +76,7 @@ void MainWindow::setUI()
     this->setMaximumSize(windowSizeX,windowSizeY*2);
     this->setStyleSheet("QStatusBar::item { border: 0px solid black }; ");
     this->switchButtons();
-    this->showNote();
+    this->showNotes();
     this->showClosestNote();
     this->setWindowIcon(QIcon(":/images/icon.tga"));
     connect(this, SIGNAL(noteDeleted()), this, SLOT(switchButtons()));
@@ -172,6 +169,8 @@ void MainWindow::createScrollArea()
     scrollArea = new QScrollArea;
     QWidget *scrollWidget = new QWidget;
     scrollLayout = new QVBoxLayout;
+    scrollLayout->setMargin(5);
+    scrollLayout->setAlignment(Qt::AlignTop);
     scrollWidget->setLayout(scrollLayout);
     scrollArea->setWidget(scrollWidget);
     scrollArea->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -179,8 +178,7 @@ void MainWindow::createScrollArea()
     scrollArea->setMaximumHeight(500);
     scrollArea->setMinimumHeight(0);
     scrollArea->setFixedHeight(200);
-    scrollArea->setWidgetResizable(true);
-    scrollLayout->setAlignment(Qt::AlignTop);
+    scrollArea->setWidgetResizable(true);    
     scrollArea->hide();
 }
 
@@ -190,7 +188,7 @@ void MainWindow::createCalendar()
     cal->setMinimumSize(500, 250);
     cal->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(cal, SIGNAL(selectionChanged()), this, SLOT(switchButtons()));
-    connect(cal, SIGNAL(selectionChanged()), this, SLOT(showNote()));
+    connect(cal, SIGNAL(selectionChanged()), this, SLOT(showNotes()));
 }
 
 void MainWindow::moveToCenter(QWidget *window)
@@ -231,23 +229,53 @@ void MainWindow::addNote(Note *n, const bool isNew)
     isChanged = true;
 }
 
-void MainWindow::showNote()
+void MainWindow::showNotes()
 {
-    QDate d = cal->selectedDate();
-    noteText->hide();
-    QString *text = notes->getTextFromDate(d);
-    if(text != nullptr)
+    const QDate d = cal->selectedDate();
+    scrollArea->hide();
+    auto notesList = notes->getNotesFromDate(d);
+    const int notesCount = notesList->size();
+    int labelsSize = noteLabels.size();
+    if(notesCount != 0)
     {
         noteTextTitle->setText(d.toString("dddd dd of MMMM yyyy:"));
-        noteText->setText(*text);
+        while(notesCount > labelsSize)
+        {
+            addNoteLabel();
+            ++labelsSize;
+        }
+        for(int i = 0; i < labelsSize; i++)
+        {
+            if(i < notesCount)
+            {
+                noteLabels[i]->setText(notesList->at(i)->text);
+                noteLabels[i]->setEnabled(true);
+                noteLabels[i]->show();
+            }
+            else
+            {
+                noteLabels[i]->setEnabled(false);
+                noteLabels[i]->hide();
+            }
+        }
     }
     else
     {
         noteTextTitle->setText("No notes on "+d.toString("dddd dd of MMMM yyyy"));
     }
     cal->setFocus();
-
     QTimer::singleShot(1, this, SLOT(resizeMe()));
+    resizeMe();
+}
+
+void MainWindow::addNoteLabel()
+{
+    QLabel *label = new QLabel;
+    label->setFrameShape(QFrame::StyledPanel);
+    label->setContentsMargins(2, 0, 0, 2);
+    label->setMargin(5);
+    scrollLayout->addWidget(label);
+    noteLabels.append(label);
 }
 
 void MainWindow::switchButtons()
@@ -268,7 +296,24 @@ void MainWindow::resizeMe()
 {
     if(noteTextTitle->text().left(8) != "No notes")
     {
-        noteText->show();
+        int scrollAreaHeight = 0;
+        for(auto label : noteLabels)
+        {
+            if(label->isEnabled())
+            {
+                label->adjustSize();
+                //TODO: fix line size hack
+                label->setFixedWidth(scrollArea->widget()->width() - scrollLayout->margin() * 2 - 20);
+                scrollAreaHeight += label->frameGeometry().height() + label->margin();
+            }
+        }
+        scrollAreaHeight += scrollLayout->margin() + 5;
+        if(scrollAreaHeight > cal->minimumHeight())
+        {
+            scrollAreaHeight = cal->minimumHeight();
+        }
+        scrollArea->setFixedHeight(scrollAreaHeight);
+        scrollArea->show();
     }
     this->resize(this->minimumSizeHint());
 }
@@ -288,15 +333,15 @@ void MainWindow::saveNotes()
 
 void MainWindow::deleteNode()
 {
-    int i = showDeleteMessageBox(DeleteOption::One);
-    if(i == QMessageBox::Yes)
-    {
-        notes->deleteNote(notes->getNoteFromDate(cal->selectedDate()));
-        this->showNote();
-        isChanged = true;
-        emit noteDeleted();
-    }
-    cal->setFocus();
+//    int i = showDeleteMessageBox(DeleteOption::One);
+//    if(i == QMessageBox::Yes)
+//    {
+//        notes->deleteNote(notes->getNoteFromDate(cal->selectedDate()));
+//        this->showNote();
+//        isChanged = true;
+//        emit noteDeleted();
+//    }
+//    cal->setFocus();
 }
 
 void MainWindow::deleteAll()
@@ -306,7 +351,7 @@ void MainWindow::deleteAll()
     {
         if(notes->deleteAll() > 0)
             isChanged = true;
-        this->showNote();
+        this->showNotes();
         emit noteDeleted();
     }
     cal->setFocus();
@@ -319,7 +364,7 @@ void MainWindow::deleteOutdated()
     {
         if(notes->deleteOutdated(QDate::currentDate()) > 0)
             isChanged = true;
-        this->showNote();
+        this->showNotes();
         emit noteDeleted();
     }
     cal->setFocus();

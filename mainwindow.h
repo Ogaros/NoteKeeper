@@ -21,7 +21,7 @@ signals:
 public slots:
     void showEditWindow();
     void addNote(Note *n, const bool);
-    void showNote();
+    void showNotes();
     void showClosestNote();
     void saveNotes();
     void deleteNode();
@@ -32,7 +32,7 @@ public slots:
 
 private slots:
     void switchButtons();
-    void resizeMe();    
+    void resizeMe();
     void closeProgram();
     void showFromTray();
     void iconActivated(QSystemTrayIcon::ActivationReason);
@@ -52,10 +52,12 @@ private:
     void createCalendar();
     void createScrollArea();
     void createEditWindow();
+    void addNoteLabel();
     bool isChanged;
     bool isClosing;
 
     std::shared_ptr<Notebook>       notes;
+    QList<QLabel*>                  noteLabels;
     EditWindow                      *editWindow;
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;
@@ -67,7 +69,6 @@ private:
     QPushButton                     *todayButton;
     QPushButton                     *quitButton;
     QLabel                          *noteTextTitle;
-    QLabel                          *noteText;
     QScrollArea                     *scrollArea;
     QVBoxLayout                     *scrollLayout;
     QLabel                          *statusLabel;
