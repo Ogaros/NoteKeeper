@@ -23,7 +23,7 @@ void MainWindow::showEditWindow()
     const QDate d = cal->selectedDate();
     if(QObject::sender() == addButton)
     {
-        editWindow->loadFields(d, nullptr);
+        editWindow->loadNotes(d, nullptr);
     }
     else if(QObject::sender() == editButton)
     {
