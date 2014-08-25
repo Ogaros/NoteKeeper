@@ -10,8 +10,7 @@ class EditWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit EditWindow(QWidget *parent = 0);
-    void loadFields(const QDate&, Note*);
+    explicit EditWindow(QWidget *parent = 0);    
     void loadNotes(const QDate&, std::unique_ptr<QList<Note*>>);
     bool isOpened(){return this->isVisible();}
 
@@ -22,12 +21,13 @@ signals:
     void noteAdded(Note*, const bool);
     void noteAdded(const QDate&);
 
-public slots:
+public slots:    
     void changeDate(const QDate& date);
     void resizeMe();
     void addNote();
 
 private slots:
+    void loadFields(int index = -1);
     void notificationDaysTextChange(const QString);
     void showRepeatGroupBoxContent(const bool on);
     void showNotificationGroupBoxContent(const bool on);
@@ -39,6 +39,7 @@ private:
     void fillNoteSelector();
 
     Note                *currentNote;
+    QDate               currentDate;
     QVBoxLayout         *mainLayout;
     QLabel              *dateLabel;
     QDateEdit           *selectedDate;
@@ -61,6 +62,7 @@ private:
     QButtonGroup        *notificationRadioButtonGroup;
     QLabel              *errorLabel;
     QDialogButtonBox    *noteAddButtons;
+    std::unique_ptr<QList<Note*>> noteList;
 };
 
 #endif // EDITWINDOW_H

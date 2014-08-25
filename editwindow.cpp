@@ -20,6 +20,11 @@ void EditWindow::setUI()
     selectedDate = new QDateEdit();
     noteTextLabel = new QLabel("Note text:");
     noteText = new QTextEdit;
+    noteSelectorLabel = new QLabel("Selected note:");
+    noteSelectorComboBox = new QComboBox;
+
+    noteSelectorLabel->hide();
+    noteSelectorComboBox->hide();
 
     noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     noteText->setPlaceholderText("Type in the note text here");
@@ -38,6 +43,8 @@ void EditWindow::setUI()
 
     mainLayout->addWidget(dateLabel);
     mainLayout->addWidget(selectedDate);
+    mainLayout->addWidget(noteSelectorLabel);
+    mainLayout->addWidget(noteSelectorComboBox);
     mainLayout->addWidget(noteTextLabel);
     mainLayout->addWidget(noteText);
     mainLayout->addWidget(repeatGroupBox);
@@ -224,19 +231,51 @@ void EditWindow::addNote()
     }
 }
 
-void EditWindow::loadNotes(const QDate &, std::unique_ptr<QList<Note *> >)
+void EditWindow::loadNotes(const QDate& date, std::unique_ptr<QList<Note*>> list)
 {
-
+    currentDate = date;
+    noteList.reset(list.release());
+    noteSelectorLabel->hide();
+    noteSelectorComboBox->hide();
+    if(noteList == nullptr)
+    {
+        loadFields();
+    }
+    else if(noteList->size() == 1)
+    {
+        loadFields(0);
+    }
+    else
+    {
+        const int lineSize = 30;
+        QString textFinal;
+        QString textTrimmed;
+        noteSelectorLabel->show();
+        noteSelectorComboBox->clear();
+        noteSelectorComboBox->show();
+        for(int i = 0; i < noteList->size(); i++)
+        {
+            textTrimmed = noteList->at(i)->text.trimmed();
+            textFinal = textTrimmed.section('\n', 0, 0);
+            if(textFinal.size() < textTrimmed.size() || textFinal.size() > lineSize)
+            {
+                textFinal = textFinal.left(lineSize) + "...";
+            }
+            noteSelectorComboBox->addItem(textFinal);
+            connect(noteSelectorComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(loadFields(int)));
+        }
+        noteSelectorComboBox->currentIndexChanged(0);
+    }
 }
 
-void EditWindow::loadFields(const QDate& date, Note *n)
+void EditWindow::loadFields(int index)
 {
-    currentNote = n;
     errorLabel->hide();
-    if(n == nullptr)
+    if(index < 0)
     {
+        currentNote = nullptr;
         this->setWindowTitle("Add a new note");
-        selectedDate->setDate(date);
+        selectedDate->setDate(currentDate);
         noteText->clear();
         repeatGroupBox->setChecked(false);
         repeatRadioButtonGroup->setExclusive(false);
@@ -253,13 +292,14 @@ void EditWindow::loadFields(const QDate& date, Note *n)
     }
     else
     {
+        currentNote = noteList->at(index);
         this->setWindowTitle("Edit note");
-        selectedDate->setDate(n->date);
-        noteText->setText(n->text);
-        if(n->frequency != nFrequency::Once)
+        selectedDate->setDate(currentDate);
+        noteText->setText(currentNote->text);
+        if(currentNote->frequency != nFrequency::Once)
         {
             repeatGroupBox->setChecked(true);
-            switch(n->frequency)
+            switch(currentNote->frequency)
             {
             case nFrequency::Week:
                 repeatWeekRadioButton->setChecked(true);
@@ -281,10 +321,10 @@ void EditWindow::loadFields(const QDate& date, Note *n)
             repeatYearRadioButton->setChecked(false);
             repeatRadioButtonGroup->setExclusive(true);
         }
-        if(n->notifEnabled)
+        if(currentNote->notifEnabled)
         {
             notificationGroupBox->setChecked(true);
-            if(n->startDate == QDate::currentDate())
+            if(currentNote->startDate == QDate::currentDate())
             {
                 notificationTodayRadioButton->setChecked(true);
                 notificationLineEdit->clear();
@@ -292,7 +332,7 @@ void EditWindow::loadFields(const QDate& date, Note *n)
             else
             {
                 notificationDaysRadioButton->setChecked(true);
-                notificationLineEdit->setText(QString::number(n->startDate.daysTo(n->date)));
+                notificationLineEdit->setText(QString::number(currentNote->startDate.daysTo(currentNote->date)));
             }
         }
         else
@@ -304,6 +344,7 @@ void EditWindow::loadFields(const QDate& date, Note *n)
             notificationRadioButtonGroup->setExclusive(true);
             notificationLineEdit->clear();
         }
+        QTimer::singleShot(1, this, SLOT(resizeMe()));
     }
 }
 
