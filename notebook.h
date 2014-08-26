@@ -29,7 +29,7 @@ public:
 
 
 private:
-    bool noteOnDate(Note*, const QDate&) const;
+    bool noteOnDate(Note* const, const QDate&) const;
     QList<Note*> notes;
     Note* parseNote(QXmlStreamReader&) const;    
 };

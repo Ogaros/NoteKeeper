@@ -187,7 +187,7 @@ bool Notebook::contains(const QDate &date) const
     return false;
 }
 
-bool Notebook::noteOnDate(Note * note, const QDate & date) const
+bool Notebook::noteOnDate(Note * const note, const QDate & date) const
 {
     if((note->date == date) ||
        (note->frequency == nFrequency::Week && note->date.daysTo(date) % 7 == 0) ||
