@@ -144,7 +144,7 @@ void Notebook::sort()
 {
     try
     {
-        qSort(notes.begin(), notes.end(), ptrLess());
+        std::stable_sort(notes.begin(), notes.end(), ptrLess());
     }
     catch(...)
     {
