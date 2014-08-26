@@ -169,7 +169,7 @@ std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate &date) cons
     std::unique_ptr<QList<Note*>> list(new QList<Note*>);
     for(auto note : notes)
     {
-        if(note->date == date)
+        if(noteOnDate(note, date))
         {
             list->append(note);
         }
@@ -180,8 +180,20 @@ std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate &date) cons
 bool Notebook::contains(const QDate &date) const
 {
     for (auto note : notes)
-        if(note->date == date)
+    {
+        if(noteOnDate(note, date))
             return true;
+    }
+    return false;
+}
+
+bool Notebook::noteOnDate(Note * note, const QDate & date) const
+{
+    if((note->date == date) ||
+       (note->frequency == nFrequency::Week && note->date.daysTo(date) % 7 == 0) ||
+       (note->frequency == nFrequency::Month && date.day() == note->date.day()) ||
+       (note->frequency == nFrequency::Year && date.day() == note->date.day()) && date.month() == note->date.month())
+        return true;
     return false;
 }
 

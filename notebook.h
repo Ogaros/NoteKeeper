@@ -29,8 +29,9 @@ public:
 
 
 private:
+    bool noteOnDate(Note*, const QDate&) const;
     QList<Note*> notes;
-    Note* parseNote(QXmlStreamReader&) const;
+    Note* parseNote(QXmlStreamReader&) const;    
 };
 
 struct ptrLess
