@@ -33,9 +33,9 @@ bool Notebook::addNote(Note *n)
     return true;
 }
 bool Notebook::addNote(const QDate date, const QString text, const nFrequency frequency,
-                       const bool notifEnabled, const QDate startDate)
+                       const bool notifEnabled, const int daysPrior)
 {
-    Note *n = new Note(date, text, frequency, notifEnabled, startDate);
+    Note *n = new Note(date, text, frequency, notifEnabled, daysPrior);
     return addNote(n);
 }
 
@@ -75,7 +75,7 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
     QString text;
     nFrequency frequency;
     bool notifEnabled;
-    QDate startDate;
+    int daysPrior;
 
     QXmlStreamAttributes attributes = xml.attributes();
     if(attributes.hasAttribute("date"))
@@ -100,15 +100,15 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
                 xml.readNext();
                 notifEnabled = xml.text().toInt();
             }
-            else if(xml.name() == "startDate")
+            else if(xml.name() == "daysPrior")
             {
                 xml.readNext();
-                startDate = QDate::fromString(xml.text().toString(),"dd/MM/yyyy");
+                daysPrior = xml.text().toInt();
             }
         }
         xml.readNext();
     }
-    n = new Note(date, text, frequency, notifEnabled, startDate);
+    n = new Note(date, text, frequency, notifEnabled, daysPrior);
     return n;
 }
 
@@ -130,7 +130,7 @@ void Notebook::saveNotes() const
         xml.writeTextElement("text",n->text);
         xml.writeTextElement("frequency",QString::number(static_cast<int>(n->frequency)));
         xml.writeTextElement("notifEnabled",QString::number(n->notifEnabled));
-        xml.writeTextElement("startDate",n->startDate.toString("dd/MM/yyyy"));
+        xml.writeTextElement("daysPrior",QString::number(n->daysPrior));
         xml.writeEndElement();
     }
 

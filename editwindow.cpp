@@ -183,7 +183,7 @@ void EditWindow::addNote()
         }
     }
     bool notifEnabled = false;
-    QDate startDate = QDate::currentDate();
+    int daysPrior = 0;
     if(notificationGroupBox->isChecked())
     {
         notifEnabled = true;
@@ -201,7 +201,7 @@ void EditWindow::addNote()
             }
             else
             {
-                startDate = date.addDays(-notificationLineEdit->text().toInt());
+                daysPrior = notificationLineEdit->text().toInt();
             }
         }
 
@@ -224,7 +224,7 @@ void EditWindow::addNote()
         n->text = text;
         n->frequency = frequency;
         n->notifEnabled = notifEnabled;
-        n->startDate = startDate;
+        n->daysPrior = daysPrior;
         emit noteAdded(n, isNew);
         emit noteAdded(n->date);
         this->hide();
@@ -324,7 +324,7 @@ void EditWindow::loadFields(int index)
         if(currentNote->notifEnabled)
         {
             notificationGroupBox->setChecked(true);
-            if(currentNote->startDate == QDate::currentDate())
+            if(currentNote->daysPrior == 0)
             {
                 notificationTodayRadioButton->setChecked(true);
                 notificationLineEdit->clear();
@@ -332,7 +332,7 @@ void EditWindow::loadFields(int index)
             else
             {
                 notificationDaysRadioButton->setChecked(true);
-                notificationLineEdit->setText(QString::number(currentNote->startDate.daysTo(currentNote->date)));
+                notificationLineEdit->setText(QString::number(currentNote->daysPrior));
             }
         }
         else

@@ -17,7 +17,7 @@ public:
     void saveNotes() const;
     bool addNote(Note *n);
     bool addNote(const QDate date, const QString text, const nFrequency frequency,
-                 const bool notifEnabled, const QDate startDate);
+                 const bool notifEnabled, const int daysPrior);
     bool deleteNote(Note *n);
     int deleteOutdated(const QDate&);
     int deleteAll();

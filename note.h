@@ -8,7 +8,7 @@ class Note
 public:
     Note(){}
     Note(const QDate date, const QString text, const nFrequency frequency,
-         const bool notifEnabled, const QDate startDate);
+         const bool notifEnabled, const int daysPrior);
 
     bool operator <(const Note& other) const
     {
@@ -19,7 +19,7 @@ public:
     QString text;
     nFrequency frequency;
     bool notifEnabled;
-    QDate startDate;
+    int daysPrior;
 };
 
 #endif // NOTE_H
