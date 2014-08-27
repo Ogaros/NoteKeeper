@@ -17,10 +17,8 @@ Notebook::~Notebook()
     deleteAll();
 }
 
-bool Notebook::addNote(Note *n)
+void Notebook::addNote(Note *n)
 {
-    if(n == nullptr)
-        return false;
     notes.append(n);
     try
     {
@@ -30,13 +28,12 @@ bool Notebook::addNote(Note *n)
     {
         throw;
     }
-    return true;
 }
-bool Notebook::addNote(const QDate date, const QString text, const nFrequency frequency,
+void Notebook::addNote(const QDate date, const QString text, const nFrequency frequency,
                        const bool notifEnabled, const int daysPrior)
 {
     Note *n = new Note(date, text, frequency, notifEnabled, daysPrior);
-    return addNote(n);
+    addNote(n);
 }
 
 void Notebook::loadNotes()
@@ -150,18 +147,6 @@ void Notebook::sort()
     {
         throw;
     }
-}
-
-QString* Notebook::getTextFromDate(const QDate &date) const
-{
-    for(auto note : notes)
-    {
-        if(note->date == date)
-            return &(note->text);
-        if(note->date > date)
-            break;
-    }
-    return nullptr;
 }
 
 std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate &date) const
