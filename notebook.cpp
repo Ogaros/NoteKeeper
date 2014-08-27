@@ -184,8 +184,11 @@ bool Notebook::noteOnDate(Note * const note, const QDate & date) const
 
 bool Notebook::deleteNote(Note *note)
 {
-   delete note;
-   return notes.removeOne(note);
+    if(notes.contains(note))
+    {
+        delete note;
+        return notes.removeOne(note);
+    }
 }
 
 int Notebook::deleteAll()

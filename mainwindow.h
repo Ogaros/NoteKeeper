@@ -4,6 +4,7 @@
 #include "widgetList.h"
 #include "orgcalendar.h"
 #include "editwindow.h"
+#include "deletedialogue.h"
 #include "note.h"
 #include "notebook.h"
 #include "memory"
@@ -24,7 +25,7 @@ public slots:
     void showNotes();
     void showClosestNote();
     void saveNotes();
-    void deleteNode();
+    void deleteNoteDialogue();
     void deleteAll();
     void deleteOutdated();
     int showDeleteMessageBox(const DeleteOption);
@@ -53,12 +54,13 @@ private:
     void createScrollArea();
     void createEditWindow();
     void addNoteLabel();
+    void deleteNote(Note *);
     bool isChanged;
     bool isClosing;
 
     std::shared_ptr<Notebook>       notes;
     QList<QLabel*>                  noteLabels;
-    EditWindow                      *editWindow;
+    std::unique_ptr<EditWindow>     editWindow;
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;
     QVBoxLayout                     *buttonsLayout;

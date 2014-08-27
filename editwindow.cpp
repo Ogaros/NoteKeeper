@@ -253,9 +253,9 @@ void EditWindow::loadNotes(const QDate& date, std::unique_ptr<QList<Note*>> list
         noteSelectorLabel->show();
         noteSelectorComboBox->clear();
         noteSelectorComboBox->show();
-        for(int i = 0; i < noteList->size(); i++)
+        for(auto note : *noteList)
         {
-            textTrimmed = noteList->at(i)->text.trimmed();
+            textTrimmed = note->text.trimmed();
             textFinal = textTrimmed.section('\n', 0, 0);
             if(textFinal.size() < textTrimmed.size() || textFinal.size() > lineSize)
             {

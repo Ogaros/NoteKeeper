@@ -26,7 +26,6 @@ public:
     bool contains (const QDate&) const;
     void sort();
 
-
 private:
     bool noteOnDate(Note* const, const QDate&) const;
     QList<Note*> notes;

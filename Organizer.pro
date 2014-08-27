@@ -7,7 +7,8 @@ HEADERS += \
     widgetList.h \
     note.h \
     notebook.h \
-    editwindow.h
+    editwindow.h \
+    deletedialogue.h
 
 SOURCES += \
     mainwindow.cpp \
@@ -15,7 +16,11 @@ SOURCES += \
     orgcalendar.cpp \
     note.cpp \
     notebook.cpp \
-    editwindow.cpp
+    editwindow.cpp \
+    deletedialogue.cpp
 
 RESOURCES += \
     resources.qrc
+
+FORMS += \
+    deletedialogue.ui

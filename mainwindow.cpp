@@ -29,19 +29,21 @@ void MainWindow::showEditWindow()
     {
         editWindow->loadNotes(d, notes->getNotesFromDate(d));
     }
-    QTimer::singleShot(1, editWindow, SLOT(resizeMe()));
+    QTimer::singleShot(1, editWindow.get(), SLOT(resizeMe()));
     editWindow->show();
-    MainWindow::moveToCenter(editWindow);
+    editWindow->activateWindow();
+    MainWindow::moveToCenter(editWindow.get());
 }
 
 void MainWindow::createEditWindow()
 {
-    editWindow = new EditWindow();
-    connect(editWindow, SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
-    connect(editWindow, SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
-    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showNotes()));
-    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
-    connect(editWindow, SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
+    editWindow.reset(new EditWindow);
+    editWindow->setWindowFlags(editWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    connect(editWindow.get(), SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
+    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
+    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showNotes()));
+    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
+    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
 }
 
 void MainWindow::setUI()
@@ -146,13 +148,13 @@ void MainWindow::createButtonLayout()
     buttonsLayout = new QVBoxLayout();
     addButton = new QPushButton("Add note");
     editButton = new QPushButton("Edit note");
-    removeButton = new QPushButton("Remove note");
+    removeButton = new QPushButton("Delete note");
     todayButton = new QPushButton("Go to current date");
     quitButton = new QPushButton("Close");
 
     connect(addButton, SIGNAL(clicked()), this, SLOT(showEditWindow()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(showEditWindow()));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(deleteNode()));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(deleteNoteDialogue()));
     connect(todayButton, SIGNAL(clicked()), cal, SLOT(showToday()));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
 
@@ -189,6 +191,7 @@ void MainWindow::createCalendar()
     cal->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(cal, SIGNAL(selectionChanged()), this, SLOT(switchButtons()));
     connect(cal, SIGNAL(selectionChanged()), this, SLOT(showNotes()));
+
 }
 
 void MainWindow::moveToCenter(QWidget *window)
@@ -331,17 +334,52 @@ void MainWindow::saveNotes()
     isChanged = false;
 }
 
-void MainWindow::deleteNode()
+void MainWindow::deleteNoteDialogue()
 {
-//    int i = showDeleteMessageBox(DeleteOption::One);
-//    if(i == QMessageBox::Yes)
-//    {
-//        notes->deleteNote(notes->getNoteFromDate(cal->selectedDate()));
-//        this->showNote();
-//        isChanged = true;
-//        emit noteDeleted();
-//    }
-//    cal->setFocus();
+    auto list = notes->getNotesFromDate(cal->selectedDate());
+    if(list->size() == 1)
+    {
+        int i = showDeleteMessageBox(DeleteOption::One);
+        if(i == QMessageBox::Yes)
+        {
+            deleteNote(list->first());
+        }
+    }
+    else
+    {
+        QStringList listTexts;
+        for(auto note : *list)
+        {
+            QString textTrimmed = note->text.trimmed();
+            QString textCropped = textTrimmed.left(50);
+            if(textTrimmed.size() > textCropped.size())
+            {
+                textCropped += "...";
+            }
+            listTexts.append(textCropped);
+        }
+        std::unique_ptr<DeleteDialogue> dialogue(new DeleteDialogue(listTexts));
+        dialogue->setWindowFlags(dialogue->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+        moveToCenter(dialogue.get());
+        dialogue->show();
+        QEventLoop loop;
+        connect(dialogue.get(), SIGNAL(ready()), &loop, SLOT(quit()));
+        loop.exec();
+        int index = dialogue->getIndex();
+        if(index >= 0)
+        {
+            deleteNote(list->at(index));
+        }
+    }
+    cal->setFocus();
+}
+
+void MainWindow::deleteNote(Note * note)
+{
+    notes->deleteNote(note);
+    this->showNotes();
+    isChanged = true;
+    emit noteDeleted();
 }
 
 void MainWindow::deleteAll()
@@ -487,6 +525,7 @@ void MainWindow::closeProgram()
 void MainWindow::showFromTray()
 {
     this->show();
+    this->activateWindow();
     cal->setFocus();
     openAction->setEnabled(false);
 }
