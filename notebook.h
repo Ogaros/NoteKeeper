@@ -22,12 +22,14 @@ public:
     int deleteOutdated(const QDate&);
     int deleteAll();
     std::unique_ptr<QList<Note*>> getNotesFromDate(const QDate&) const;
+    std::unique_ptr<QList<Note*>> getNotificationsFromDate(const QDate&) const;
     Note* findClosest(const QDate&) const;
     bool contains (const QDate&) const;
     void sort();
 
 private:
     bool noteOnDate(Note* const, const QDate&) const;
+    bool notificationOnDate(Note* const note, const QDate&date) const;
     QList<Note*> notes;
     Note* parseNote(QXmlStreamReader&) const;    
 };

@@ -149,12 +149,25 @@ void Notebook::sort()
     }
 }
 
-std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate &date) const
+std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate & date) const
 {
     std::unique_ptr<QList<Note*>> list(new QList<Note*>);
     for(auto note : notes)
     {
         if(noteOnDate(note, date))
+        {
+            list->append(note);
+        }
+    }
+    return list;
+}
+
+std::unique_ptr<QList<Note*>> Notebook::getNotificationsFromDate(const QDate & date) const
+{
+    std::unique_ptr<QList<Note*>> list(new QList<Note*>);
+    for(auto note : notes)
+    {
+        if(notificationOnDate(note, date))
         {
             list->append(note);
         }
@@ -182,6 +195,44 @@ bool Notebook::noteOnDate(Note * const note, const QDate & date) const
     return false;
 }
 
+bool Notebook::notificationOnDate(Note * const note, const QDate & date) const
+{
+    if(note->notifEnabled)
+    {
+        if(note->frequency == nFrequency::Once)
+        {
+            if(note->date > date && date >= note->date.addDays(-note->daysPrior))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            QDate repeatedDate = note->date;
+            QDate tempDate;
+            QDate (*next)(QDate&, int&);
+            bool (*compare)(QDate &noteDate, QDate &currentDate);
+            if(note->frequency == nFrequency::Week)
+                next = [](QDate &d, int &sign){return d.addDays(sign * 7);};
+            else if(note->frequency == nFrequency::Month)
+                next = [](QDate &d, int &sign){return d.addMonths(sign * 1);};
+            else
+                next = [](QDate &d, int &sign){return d.addYears(sign * 1);};
+            int sign = note->date > date ? 1 : -1;
+            if(sign == 1)
+                compare = [](QDate &noteDate, QDate &currentDate)->bool{return noteDate >= currentDate;};
+            else
+                compare = [](QDate &noteDate, QDate &currentDate)->bool{return noteDate <= currentDate;};
+            tempDate = next(repeatedDate, sign);
+            if(note->date > date)
+            {
+
+            }
+        }
+    }
+    return false;
+}
+
 bool Notebook::deleteNote(Note *note)
 {
     if(notes.contains(note))
@@ -189,29 +240,33 @@ bool Notebook::deleteNote(Note *note)
         delete note;
         return notes.removeOne(note);
     }
+    return false;
 }
 
 int Notebook::deleteAll()
 {
     int deleted = notes.size();
-    for(auto iNote = notes.begin(); iNote != notes.end(); iNote++)
+    for(auto note : notes)
     {
-        delete *iNote;
-        notes.erase(iNote);
+        delete note;
     }
+    notes.clear();
     return deleted;
 }
 
 int Notebook::deleteOutdated(const QDate &date)
 {
     int deleted = 0;
-    for(auto iNote = notes.begin(); iNote != notes.end(); iNote++)
+    for(auto note : notes)
     {
-        if((*iNote)->date < date)
+        if(note->date < date)
         {
-            delete *iNote;
-            notes.erase(iNote);
-            ++deleted;
+            if(note->frequency == nFrequency::Once)
+            {
+                delete note;
+                notes.removeOne(note);
+                ++deleted;
+            }
         }
         else
             return deleted;

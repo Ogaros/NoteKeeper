@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     this->setUI();
     createEditWindow();
+    showTrayMessage();
 }
 
 void MainWindow::showEditWindow()
@@ -488,8 +489,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
         this->hide();
         openAction->setEnabled(true);
-        //Temporary
-        showTrayMessage(QDate::currentDate().addDays(10));
     }
 }
 
@@ -549,8 +548,25 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void MainWindow::showTrayMessage(const QDate& date)
+void MainWindow::showTrayMessage()
 {
-    trayIcon->showMessage(date.toString("dd/MM/yyyy")+" (in "+QString::number(static_cast<ulong>(QDate::currentDate().daysTo(date)))+" days):",
-                          "*notes->getTextFromDate(date)");
+    static int noteIndex = -1;
+    static std::unique_ptr<QList<Note*>> noteList;
+    if(noteIndex < 0)
+    {
+        noteList.reset(notes->getNotificationsFromDate(QDate::currentDate()).release());
+        noteIndex = noteList->size() - 1;
+    }
+    if(noteIndex >= 0)
+    {
+        Note* note = noteList->at(noteIndex);
+        QString Title = note->date.toString("dd/MM/yyyy");
+        note->date == QDate::currentDate() ? Title += " (Today)" :
+                                             Title += " (in "+QString::number(static_cast<ulong>(QDate::currentDate().daysTo(note->date)))+" days):";
+        trayIcon->showMessage(Title, note->text);
+        if(--noteIndex >= 0)
+        {
+            QTimer::singleShot(10000, this, SLOT(showTrayMessage()));
+        }
+    }
 }

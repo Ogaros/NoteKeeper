@@ -37,7 +37,7 @@ private slots:
     void closeProgram();
     void showFromTray();
     void iconActivated(QSystemTrayIcon::ActivationReason);
-    void showTrayMessage(const QDate&);
+    void showTrayMessage();
 
 protected:
     void closeEvent(QCloseEvent *event);
