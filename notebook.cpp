@@ -199,35 +199,43 @@ bool Notebook::notificationOnDate(Note * const note, const QDate & date) const
 {
     if(note->notifEnabled)
     {
+        if(note->date == date)
+            return true;
+        auto showNotification = [&](QDate &noteDate)->bool{return noteDate >= date && date >= noteDate.addDays(-note->daysPrior);};
         if(note->frequency == nFrequency::Once)
         {
-            if(note->date > date && date >= note->date.addDays(-note->daysPrior))
-            {
-                return true;
-            }
+            return showNotification(note->date);
         }
         else
         {
-            QDate repeatedDate = note->date;
-            QDate tempDate;
             QDate (*next)(QDate&, int&);
-            bool (*compare)(QDate &noteDate, QDate &currentDate);
             if(note->frequency == nFrequency::Week)
                 next = [](QDate &d, int &sign){return d.addDays(sign * 7);};
             else if(note->frequency == nFrequency::Month)
                 next = [](QDate &d, int &sign){return d.addMonths(sign * 1);};
             else
                 next = [](QDate &d, int &sign){return d.addYears(sign * 1);};
-            int sign = note->date > date ? 1 : -1;
-            if(sign == 1)
-                compare = [](QDate &noteDate, QDate &currentDate)->bool{return noteDate >= currentDate;};
-            else
-                compare = [](QDate &noteDate, QDate &currentDate)->bool{return noteDate <= currentDate;};
-            tempDate = next(repeatedDate, sign);
+            int sign = note->date > date ? -1 : 1;
+            QDate closestDate = note->date;
+            QDate tempDate = next(closestDate, sign);
             if(note->date > date)
             {
-
+                while(tempDate >= date)
+                {
+                    closestDate = tempDate;
+                    tempDate = next(tempDate, sign);
+                }
             }
+            else
+            {
+                while(tempDate < date)
+                {
+                    tempDate = next(tempDate, sign);
+                }
+                closestDate = tempDate;
+            }
+            note->date = closestDate;
+            return showNotification(closestDate);
         }
     }
     return false;

@@ -555,18 +555,22 @@ void MainWindow::showTrayMessage()
     if(noteIndex < 0)
     {
         noteList.reset(notes->getNotificationsFromDate(QDate::currentDate()).release());
-        noteIndex = noteList->size() - 1;
+        noteIndex = 0;
     }
     if(noteIndex >= 0)
     {
         Note* note = noteList->at(noteIndex);
         QString Title = note->date.toString("dd/MM/yyyy");
-        note->date == QDate::currentDate() ? Title += " (Today)" :
+        note->date == QDate::currentDate() ? Title += " (Today)    " :
                                              Title += " (in "+QString::number(static_cast<ulong>(QDate::currentDate().daysTo(note->date)))+" days):";
-        trayIcon->showMessage(Title, note->text);
-        if(--noteIndex >= 0)
+        trayIcon->showMessage(Title, note->text, QSystemTrayIcon::Information, 10000);
+        if(++noteIndex < noteList->size())
         {
             QTimer::singleShot(10000, this, SLOT(showTrayMessage()));
+        }
+        else
+        {
+            noteIndex = -1;
         }
     }
 }
