@@ -561,8 +561,19 @@ void MainWindow::showTrayMessage()
     {
         Note* note = noteList->at(noteIndex);
         QString Title = note->date.toString("dd/MM/yyyy");
-        note->date == QDate::currentDate() ? Title += " (Today)    " :
-                                             Title += " (in "+QString::number(static_cast<ulong>(QDate::currentDate().daysTo(note->date)))+" days):";
+        qint64 days = QDate::currentDate().daysTo(note->date);
+        switch(days)
+        {
+        case 0:
+            Title += " (Today)    ";
+            break;
+        case 1:
+            Title += " (in "+QString::number(days)+" day):";
+            break;
+        default:
+            Title += " (in "+QString::number(days)+" days):";
+            break;
+        }
         trayIcon->showMessage(Title, note->text, QSystemTrayIcon::Information, 10000);
         if(++noteIndex < noteList->size())
         {
