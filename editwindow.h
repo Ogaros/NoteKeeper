@@ -37,6 +37,7 @@ private:
     void createRepeatGroupBox();
     void createNotificationGroupBox();
     void fillNoteSelector();
+    void resizeTimer();
 
     Note                *currentNote;
     QDate               currentDate;

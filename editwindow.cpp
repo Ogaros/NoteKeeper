@@ -131,7 +131,7 @@ void EditWindow::showRepeatGroupBoxContent(const bool on)
     repeatWeekRadioButton->setVisible(on);
     repeatMonthRadioButton->setVisible(on);
     repeatYearRadioButton->setVisible(on);
-    QTimer::singleShot(1, this, SLOT(resizeMe()));
+    resizeTimer();
 }
 
 void EditWindow::showNotificationGroupBoxContent(const bool on)
@@ -140,7 +140,7 @@ void EditWindow::showNotificationGroupBoxContent(const bool on)
     notificationTodayRadioButton->setVisible(on);
     notificationDaysRadioButton->setVisible(on);
     notificationLineEdit->setVisible(on);
-    QTimer::singleShot(1, this, SLOT(resizeMe()));
+    resizeTimer();
 }
 
 void EditWindow::resizeMe()
@@ -148,6 +148,11 @@ void EditWindow::resizeMe()
     this->resize(this->minimumSizeHint());
     noteText->resize(noteText->minimumSize());
     noteText->resize(noteText->sizeHint());
+}
+
+void EditWindow::resizeTimer()
+{
+    QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
 
 void EditWindow::addNote()
@@ -210,7 +215,7 @@ void EditWindow::addNote()
     {
         errorLabel->setText(errorLabel->text().trimmed());
         errorLabel->show();
-        QTimer::singleShot(1, this, SLOT(resizeMe()));
+        resizeTimer();
     }
     else
     {
@@ -343,9 +348,9 @@ void EditWindow::loadFields(int index)
             notificationDaysRadioButton->setChecked(false);
             notificationRadioButtonGroup->setExclusive(true);
             notificationLineEdit->clear();
-        }
-        QTimer::singleShot(1, this, SLOT(resizeMe()));
+        }        
     }
+    resizeTimer();
 }
 
 void EditWindow::notificationDaysTextChange(const QString days)

@@ -30,7 +30,6 @@ void MainWindow::showEditWindow()
     {
         editWindow->loadNotes(d, notes->getNotesFromDate(d));
     }
-    QTimer::singleShot(1, editWindow.get(), SLOT(resizeMe()));
     editWindow->show();
     editWindow->activateWindow();
     MainWindow::moveToCenter(editWindow.get());
@@ -275,8 +274,7 @@ void MainWindow::showNotes()
         noteTextTitle->setText("No notes on "+d.toString("dddd dd of MMMM yyyy"));
     }
     cal->setFocus();
-    QTimer::singleShot(1, this, SLOT(resizeMe()));
-    resizeMe();
+    resizeTimer();
 }
 
 void MainWindow::addNoteLabel()
@@ -327,6 +325,11 @@ void MainWindow::resizeMe()
         scrollArea->show();
     }
     this->resize(this->minimumSizeHint());
+}
+
+void MainWindow::resizeTimer()
+{
+    QTimer::singleShot(1, this, SLOT(resizeMe()));
 }
 
 void MainWindow::saveNotes()

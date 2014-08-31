@@ -32,7 +32,7 @@ public slots:
     int showExitWOSavingMessageBox();
 
 private slots:
-    void switchButtons();
+    void switchButtons();    
     void resizeMe();
     void closeProgram();
     void showFromTray();
@@ -55,6 +55,7 @@ private:
     void createEditWindow();
     void addNoteLabel();
     void deleteNote(Note *);
+    void resizeTimer();
     bool isChanged;
     bool isClosing;
 
