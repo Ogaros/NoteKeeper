@@ -139,6 +139,13 @@ void MainWindow::createTrayIcon()
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setToolTip("Organizer");
 
+    trayTimer = new QTimer(this);
+    trayTimer->setInterval(10000);
+    trayTimer->setSingleShot(true);
+    connect(trayTimer, SIGNAL(timeout()), this, SLOT(showTrayMessage()));
+    connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showTrayMessage()));
+    connect(trayIcon, SIGNAL(messageClicked()), trayTimer, SLOT(stop()));
+
     // TODO: Make real icon.
     trayIcon->setIcon(QIcon(":/images/icon.tga"));
     trayIcon->show();
@@ -560,25 +567,26 @@ void MainWindow::showTrayMessage()
     }
     if(noteIndex >= 0)
     {
-        Note* note = noteList->at(noteIndex);
-        QString Title = note->date.toString("dd/MM/yyyy");
-        qint64 days = QDate::currentDate().daysTo(note->date);
-        switch(days)
+        if(noteIndex < noteList->size())
         {
-        case 0:
-            Title += " (Today)    ";
-            break;
-        case 1:
-            Title += " (in "+QString::number(days)+" day):";
-            break;
-        default:
-            Title += " (in "+QString::number(days)+" days):";
-            break;
-        }
-        trayIcon->showMessage(Title, note->text, QSystemTrayIcon::Information, 10000);
-        if(++noteIndex < noteList->size())
-        {
-            QTimer::singleShot(10000, this, SLOT(showTrayMessage()));
+            Note* note = noteList->at(noteIndex);
+            QString Title = note->date.toString("dd/MM/yyyy");
+            qint64 days = QDate::currentDate().daysTo(note->date);
+            switch(days)
+            {
+            case 0:
+                Title += " (Today)    ";
+                break;
+            case 1:
+                Title += " (in "+QString::number(days)+" day):";
+                break;
+            default:
+                Title += " (in "+QString::number(days)+" days):";
+                break;
+            }
+            trayIcon->showMessage(Title, note->text, QSystemTrayIcon::Information, trayTimer->interval());
+            trayTimer->start();
+            ++noteIndex;
         }
         else
         {
