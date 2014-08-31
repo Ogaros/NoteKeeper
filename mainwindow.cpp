@@ -555,7 +555,8 @@ void MainWindow::showTrayMessage()
     if(noteIndex < 0)
     {
         noteList.reset(notes->getNotificationsFromDate(QDate::currentDate()).release());
-        noteIndex = 0;
+        if(!noteList->isEmpty())
+            noteIndex = 0;
     }
     if(noteIndex >= 0)
     {
