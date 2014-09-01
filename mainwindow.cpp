@@ -92,6 +92,7 @@ void MainWindow::createMenu()
 
     QList<QAction *> fileActions;
     fileActions.append(new QAction("Save notes",this));
+    fileActions.back()->setShortcut(Qt::CTRL | Qt::Key_S);
     fileActions.append(new QAction("Import notes...",this));
     fileActions.append(new QAction("Export notes...",this));
     fileActions.append(new QAction("Delete outdated notes",this));
