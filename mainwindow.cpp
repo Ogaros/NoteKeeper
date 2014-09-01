@@ -96,12 +96,15 @@ void MainWindow::createMenu()
     fileActions.append(new QAction("Export notes...",this));
     fileActions.append(new QAction("Delete outdated notes",this));
     fileActions.append(new QAction("Delete all notes",this));
+    QAction *settings = new QAction("Settings...", this);
 
     connect(fileActions.front(), SIGNAL(triggered()), this, SLOT(saveNotes()));
     connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
     connect(fileActions.at(4), SIGNAL(triggered()), this, SLOT(deleteAll()));
 
     fileMenu->addActions(fileActions);
+    fileMenu->addSeparator();
+    fileMenu->addAction(settings);
 
     helpMenu->addAction(new QAction("How to use...",this));
     helpMenu->addAction(new QAction("About...",this));
