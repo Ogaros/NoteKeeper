@@ -4,7 +4,7 @@
 #include <QWidget>
 
 namespace Ui {
-class Deletedialogue;
+class DeleteDialogue;
 }
 
 class DeleteDialogue : public QWidget
@@ -23,7 +23,7 @@ signals:
     void ready();
 
 private:
-    Ui::Deletedialogue *ui;    
+    Ui::DeleteDialogue *ui;    
     int index;
 };
 

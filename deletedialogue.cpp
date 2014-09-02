@@ -3,7 +3,7 @@
 
 DeleteDialogue::DeleteDialogue(QStringList list, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Deletedialogue)
+    ui(new Ui::DeleteDialogue)
 {
     ui->setupUi(this);
     ui->comboBox->addItems(list);

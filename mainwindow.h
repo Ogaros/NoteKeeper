@@ -5,6 +5,7 @@
 #include "orgcalendar.h"
 #include "editwindow.h"
 #include "deletedialogue.h"
+#include "settingswindow.h"
 #include "note.h"
 #include "notebook.h"
 #include "memory"
@@ -28,6 +29,7 @@ public slots:
     void deleteNoteDialogue();
     void deleteAll();
     void deleteOutdated();
+    void showSettings();
     int showDeleteMessageBox(const DeleteOption);
     int showExitWOSavingMessageBox();
 
@@ -62,6 +64,7 @@ private:
     std::shared_ptr<Notebook>       notes;
     QList<QLabel*>                  noteLabels;
     std::unique_ptr<EditWindow>     editWindow;
+    std::unique_ptr<SettingsWindow> settingsWindow;
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;
     QVBoxLayout                     *buttonsLayout;

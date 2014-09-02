@@ -102,6 +102,7 @@ void MainWindow::createMenu()
     connect(fileActions.front(), SIGNAL(triggered()), this, SLOT(saveNotes()));
     connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
     connect(fileActions.at(4), SIGNAL(triggered()), this, SLOT(deleteAll()));
+    connect(settings, SIGNAL(triggered()), this, SLOT(showSettings()));
 
     fileMenu->addActions(fileActions);
     fileMenu->addSeparator();
@@ -600,4 +601,9 @@ void MainWindow::showTrayMessage()
             noteIndex = -1;
         }
     }
+}
+
+void MainWindow::showSettings()
+{
+
 }

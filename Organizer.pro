@@ -8,7 +8,8 @@ HEADERS += \
     note.h \
     notebook.h \
     editwindow.h \
-    deletedialogue.h
+    deletedialogue.h \
+    settingswindow.h
 
 SOURCES += \
     mainwindow.cpp \
@@ -17,12 +18,14 @@ SOURCES += \
     note.cpp \
     notebook.cpp \
     editwindow.cpp \
-    deletedialogue.cpp
+    deletedialogue.cpp \
+    settingswindow.cpp
 
 RESOURCES += \
     resources.qrc
 
 FORMS += \
-    deletedialogue.ui
+    deletedialogue.ui \
+    SettingsWindow.ui
 
 CONFIG += C++11
