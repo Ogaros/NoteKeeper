@@ -229,7 +229,9 @@ void EditWindow::addNote()
         n->text = text;
         n->frequency = frequency;
         n->notifEnabled = notifEnabled;
-        n->daysPrior = daysPrior;
+        n->daysPrior = notificationTodayRadioButton->isChecked() ?
+                      abs(date.daysTo(QDate::currentDate())) :
+                      daysPrior;
         emit noteAdded(n, isNew);
         emit noteAdded(n->date);
         this->hide();
