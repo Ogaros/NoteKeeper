@@ -24,3 +24,5 @@ RESOURCES += \
 
 FORMS += \
     deletedialogue.ui
+
+CONFIG += C++11
