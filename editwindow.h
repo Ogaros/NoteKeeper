@@ -36,7 +36,7 @@ private:
     void setUI();
     void createRepeatGroupBox();
     void createNotificationGroupBox();
-    void fillNoteSelector();
+    void fillNoteSelector();    
     void resizeTimer();
 
     Note                *currentNote;

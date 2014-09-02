@@ -152,7 +152,7 @@ void EditWindow::resizeMe()
 
 void EditWindow::resizeTimer()
 {
-    QTimer::singleShot(1, this, SLOT(resizeMe()));
+    QTimer::singleShot(2, this, SLOT(resizeMe()));
 }
 
 void EditWindow::addNote()
