@@ -42,7 +42,7 @@ void Notebook::loadNotes()
     if(!file.exists())
         return;
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        throw std::exception("Failed to open OrgNotes.xml");
+        throw std::runtime_error("Failed to open OrgNotes.xml");
     QXmlStreamReader xml(&file);
 
     while (!xml.atEnd() && !xml.hasError())
@@ -61,7 +61,7 @@ void Notebook::loadNotes()
         }
     }
     if(xml.hasError())
-        throw std::exception(xml.errorString().toLocal8Bit());
+        throw std::runtime_error(xml.errorString().toStdString());
     file.close();
 }
 
@@ -113,7 +113,7 @@ void Notebook::saveNotes() const
 {
     QFile file("OrgNotes.xml");
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        throw std::exception("Failed to open OrgNotes.xml");
+        throw std::runtime_error("Failed to open OrgNotes.xml");
     QXmlStreamWriter xml(&file);
     xml.setAutoFormatting(true);
 

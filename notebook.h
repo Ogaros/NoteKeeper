@@ -44,7 +44,7 @@ struct ptrLess
         }
         else
         {
-            throw std::exception("Null pointer passed as an argument");
+            throw std::runtime_error("Null pointer passed as an argument");
         }
     }
 };
