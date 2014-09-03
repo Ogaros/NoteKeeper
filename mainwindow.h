@@ -55,6 +55,7 @@ private:
     void createCalendar();
     void createScrollArea();
     void createEditWindow();
+    void createSettingsWindow();
     void addNoteLabel();
     void deleteNote(Note *);
     void resizeTimer();

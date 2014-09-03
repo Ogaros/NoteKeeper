@@ -12,3 +12,9 @@ SettingsWindow::~SettingsWindow()
 {
     delete ui;
 }
+
+void SettingsWindow::closeEvent(QCloseEvent *event)
+{
+    event->ignore();
+    this->hide();
+}

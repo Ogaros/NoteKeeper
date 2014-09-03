@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     this->setUI();
     createEditWindow();
+    createSettingsWindow();
     showTrayMessage();
 }
 
@@ -44,6 +45,13 @@ void MainWindow::createEditWindow()
     connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showNotes()));
     connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
     connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
+}
+
+void MainWindow::createSettingsWindow()
+{
+    settingsWindow.reset(new SettingsWindow);
+    settingsWindow->setWindowFlags(editWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    settingsWindow->hide();
 }
 
 void MainWindow::setUI()
@@ -605,5 +613,5 @@ void MainWindow::showTrayMessage()
 
 void MainWindow::showSettings()
 {
-
+    settingsWindow->show();
 }
