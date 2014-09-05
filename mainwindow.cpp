@@ -50,7 +50,7 @@ void MainWindow::createEditWindow()
 void MainWindow::createSettingsWindow()
 {
     settingsWindow.reset(new SettingsWindow);
-    settingsWindow->setWindowFlags(editWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    settingsWindow->setWindowFlags(settingsWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     settingsWindow->hide();
 }
 
@@ -135,13 +135,16 @@ void MainWindow::createStatusBar()
 
 void MainWindow::createTrayIcon()
 {
+    notificationsAction = new QAction("Show today's notifications", this);
     openAction = new QAction("Open Organizer", this);
     quitAction = new QAction("Exit", this);
 
     trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(notificationsAction);
     trayIconMenu->addAction(openAction);
     trayIconMenu->addAction(quitAction);
 
+    connect(notificationsAction, SIGNAL(triggered()), this, SLOT(showTrayMessage()));
     connect(openAction, SIGNAL(triggered()), this, SLOT(showFromTray()));
     openAction->setEnabled(false);
     connect(quitAction, SIGNAL(triggered()), this, SLOT(closeProgram()));
@@ -156,7 +159,6 @@ void MainWindow::createTrayIcon()
     trayTimer->setSingleShot(true);
     connect(trayTimer, SIGNAL(timeout()), this, SLOT(showTrayMessage()));
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showTrayMessage()));
-    connect(trayIcon, SIGNAL(messageClicked()), trayTimer, SLOT(stop()));
 
     // TODO: Make real icon.
     trayIcon->setIcon(QIcon(":/images/icon.tga"));
@@ -575,11 +577,14 @@ void MainWindow::showTrayMessage()
 {
     static int noteIndex = -1;
     static std::unique_ptr<QList<Note*>> noteList;
+    trayTimer->stop();
     if(noteIndex < 0)
     {
         noteList.reset(notes->getNotificationsFromDate(QDate::currentDate()).release());
         if(!noteList->isEmpty())
+        {
             noteIndex = 0;
+        }
     }
     if(noteIndex >= 0)
     {
@@ -606,6 +611,8 @@ void MainWindow::showTrayMessage()
         }
         else
         {
+            trayIcon->hide();
+            trayIcon->show();
             noteIndex = -1;
         }
     }

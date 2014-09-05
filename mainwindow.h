@@ -82,6 +82,7 @@ private:
     QSystemTrayIcon                 *trayIcon;
     QMenu                           *trayIconMenu;
     QAction                         *quitAction;
+    QAction                         *notificationsAction;
     QAction                         *openAction;
     QTimer                          *trayTimer;
 };
