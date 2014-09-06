@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     try
     {
-        notes = std::make_shared<Notebook>(new Notebook);
+        notes = std::make_shared<Notebook>(settings);
     }
     catch(std::exception& e)
     {
@@ -49,7 +49,7 @@ void MainWindow::createEditWindow()
 
 void MainWindow::createSettingsWindow()
 {
-    settingsWindow.reset(new SettingsWindow);
+    settingsWindow.reset(new SettingsWindow(settings));
     settingsWindow->setWindowFlags(settingsWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     settingsWindow->hide();
 }
@@ -208,7 +208,7 @@ void MainWindow::createScrollArea()
 
 void MainWindow::createCalendar()
 {
-    cal = new orgCalendar(notes);
+    cal = new orgCalendar(notes, settings);
     cal->setMinimumSize(500, 250);
     cal->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(cal, SIGNAL(selectionChanged()), this, SLOT(switchButtons()));

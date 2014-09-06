@@ -1,7 +1,8 @@
 #include "notebook.h"
 
-Notebook::Notebook()
+Notebook::Notebook(const std::weak_ptr<Settings> settings)
 {
+    this->settings = settings.lock();
     try
     {
         loadNotes();

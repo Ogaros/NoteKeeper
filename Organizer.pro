@@ -9,7 +9,8 @@ HEADERS += \
     notebook.h \
     editwindow.h \
     deletedialogue.h \
-    settingswindow.h
+    settingswindow.h \
+    settings.h
 
 SOURCES += \
     mainwindow.cpp \

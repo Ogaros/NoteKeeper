@@ -1,9 +1,10 @@
 #include "orgcalendar.h"
 
-orgCalendar::orgCalendar(std::weak_ptr<Notebook> notes,QWidget *parent) :
+orgCalendar::orgCalendar(const std::weak_ptr<Notebook> notes, const std::weak_ptr<Settings> settings, QWidget *parent) :
     QCalendarWidget(parent)
 {
-    this->notes = notes.lock();
+    this->notes = notes.lock();    
+    this->settings = settings.lock();
     this->setFirstDayOfWeek(Qt::Monday);
     this->setGridVisible(true);
     this->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
@@ -33,7 +34,6 @@ void orgCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &d
     if(notes->contains(date))
     {
         painter->save ();
-
         QRect circleRect = rect;
         int cellHeight = (rect.top() - rect.bottom()) / 2;
         circleRect.setLeft(rect.center().x() - cellHeight);

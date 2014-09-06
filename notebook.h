@@ -6,12 +6,12 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include "memory"
+#include "settings.h"
 
 class Notebook
 {
 public:
-    Notebook();
-    Notebook(Notebook*){loadNotes();}
+    Notebook(const std::weak_ptr<Settings>);
     ~Notebook();
     void loadNotes();
     void saveNotes() const;
@@ -31,6 +31,7 @@ private:
     bool noteOnDate(Note* const, const QDate&) const;
     bool notificationOnDate(Note* const note, const QDate&date) const;
     QList<Note*> notes;
+    std::shared_ptr<Settings> settings;
     Note* parseNote(QXmlStreamReader&) const;    
 };
 

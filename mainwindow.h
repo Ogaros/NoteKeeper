@@ -9,6 +9,7 @@
 #include "note.h"
 #include "notebook.h"
 #include "memory"
+#include "settings.h"
 
 enum class DeleteOption{One, Outdated, All};
 class MainWindow : public QMainWindow
@@ -63,9 +64,10 @@ private:
     bool isClosing;
 
     std::shared_ptr<Notebook>       notes;
+    std::shared_ptr<Settings>       settings;
     QList<QLabel*>                  noteLabels;
     std::unique_ptr<EditWindow>     editWindow;
-    std::unique_ptr<SettingsWindow> settingsWindow;
+    std::unique_ptr<SettingsWindow> settingsWindow;    
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;
     QVBoxLayout                     *buttonsLayout;
