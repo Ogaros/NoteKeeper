@@ -8,11 +8,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     try
     {
+        settings = std::make_shared<Settings>();
         notes = std::make_shared<Notebook>(settings);
     }
     catch(std::exception& e)
     {
-        QMessageBox::critical(parent, "Notebook::loadNotes", QString::fromLocal8Bit(e.what()));
+        QMessageBox::critical(parent, "MainWindow::MainWindow", QString::fromLocal8Bit(e.what()));
     }
     this->setUI();
     createEditWindow();
