@@ -28,26 +28,27 @@ public:
     void sort();
 
 private:
+    const QString filePath = QApplication::applicationDirPath() + "/OrgNotes.xml";
     bool noteOnDate(Note* const, const QDate&) const;
     bool notificationOnDate(Note* const note, const QDate&date) const;
     QList<Note*> notes;
     std::shared_ptr<Settings> settings;
-    Note* parseNote(QXmlStreamReader&) const;    
-};
+    Note* parseNote(QXmlStreamReader&) const;
 
-struct ptrLess
-{
-    bool operator()(const Note *a, const Note *b)
+    struct ptrLess
     {
-        if(a != nullptr && b != nullptr)
+        bool operator()(const Note *a, const Note *b)
         {
-            return *a < *b;
+            if(a != nullptr && b != nullptr)
+            {
+                return *a < *b;
+            }
+            else
+            {
+                throw std::runtime_error("Null pointer passed as an argument");
+            }
         }
-        else
-        {
-            throw std::runtime_error("Null pointer passed as an argument");
-        }
-    }
+    };
 };
 
 #endif // NOTEBOOK_H
