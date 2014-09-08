@@ -20,7 +20,8 @@ SOURCES += \
     notebook.cpp \
     editwindow.cpp \
     deletedialogue.cpp \
-    settingswindow.cpp
+    settingswindow.cpp \
+    settings.cpp
 
 RESOURCES += \
     resources.qrc
