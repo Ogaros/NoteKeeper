@@ -34,12 +34,11 @@ void SettingsWindow::buttonsClicked(QAbstractButton *button)
     {
     case QDialogButtonBox::Apply:
         saveSettings();
-        break;
     case QDialogButtonBox::Cancel:
         hide();
         break;
     case QDialogButtonBox::RestoreDefaults:
-        settings->reset();
+        settings->restore();
         loadSettings();
         break;
     }
@@ -73,4 +72,5 @@ void SettingsWindow::saveSettings()
         settings->rDisplay = Settings::Future;
     else
         settings->rDisplay = Settings::Closest;
+    settings->save();
 }

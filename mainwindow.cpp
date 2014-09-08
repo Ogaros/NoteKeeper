@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     try
     {
         settings = std::make_shared<Settings>();
+        settings->load();
         notes = std::make_shared<Notebook>(settings);
     }
     catch(std::exception& e)

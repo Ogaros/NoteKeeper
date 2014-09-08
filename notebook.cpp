@@ -39,7 +39,7 @@ void Notebook::addNote(const QDate date, const QString text, const nFrequency fr
 
 void Notebook::loadNotes()
 {
-    QFile file("OrgNotes.xml");
+    QFile file(filePath);
     if(!file.exists())
         return;
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -112,7 +112,7 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
 
 void Notebook::saveNotes() const
 {
-    QFile file("OrgNotes.xml");
+    QFile file(filePath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
         throw std::runtime_error("Failed to open OrgNotes.xml");
     QXmlStreamWriter xml(&file);
