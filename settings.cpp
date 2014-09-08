@@ -28,5 +28,6 @@ void Settings::load()
     else
     {
         restore();
+        save();
     }
 }
