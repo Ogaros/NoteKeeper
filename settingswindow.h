@@ -18,6 +18,7 @@ class SettingsWindow : public QWidget
 public:
     explicit SettingsWindow(std::weak_ptr<Settings>, QWidget *parent = 0);
     ~SettingsWindow();
+    void loadSettings();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -25,12 +26,15 @@ protected:
 private slots:
     void buttonsClicked(QAbstractButton*);
 
+signals:
+    void dateFormatChanged();
+
 private:
-    void setConnections();
-    void loadSettings();
-    void saveSettings();
+    void setConnections();    
+    void saveSettings();    
+    void loadSettings(Settings *l_settings);
     Ui::SettingsWindow *ui;
-    std::shared_ptr<Settings> settings;
+    std::shared_ptr<Settings> settings;    
 };
 
 #endif // SETTINGSWINDOW_H

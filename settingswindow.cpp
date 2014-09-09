@@ -38,17 +38,24 @@ void SettingsWindow::buttonsClicked(QAbstractButton *button)
         hide();
         break;
     case QDialogButtonBox::RestoreDefaults:
-        settings->restore();
-        loadSettings();
+    {
+        std::unique_ptr<Settings> temp_settings(new Settings);
+        loadSettings(temp_settings.get());
         break;
+    }
     }
 }
 
 void SettingsWindow::loadSettings()
 {
-    ui->dateFormatEdit->setText(settings->dateFormat);
-    ui->startupCheckBox->setChecked(settings->autorun);
-    switch(settings->rDisplay)
+    loadSettings(settings.get());
+}
+
+void SettingsWindow::loadSettings(Settings *l_settings)
+{
+    ui->dateFormatEdit->setText(l_settings->dateFormat);
+    ui->startupCheckBox->setChecked(l_settings->autorun);
+    switch(l_settings->rDisplay)
     {
     case Settings::All:
         ui->repeatedShowAllRB->setChecked(true);
@@ -65,12 +72,16 @@ void SettingsWindow::loadSettings()
 void SettingsWindow::saveSettings()
 {
     settings->autorun = ui->startupCheckBox->isChecked();
-    settings->dateFormat = ui->dateFormatEdit->text();
     if(ui->repeatedShowAllRB->isChecked())
         settings->rDisplay = Settings::All;
     else if(ui->repeatedShowFutureRB->isChecked())
         settings->rDisplay = Settings::Future;
     else
         settings->rDisplay = Settings::Closest;
+    if(settings->dateFormat != ui->dateFormatEdit->text())
+    {
+        settings->dateFormat = ui->dateFormatEdit->text();
+        emit dateFormatChanged();
+    }
     settings->save();
 }

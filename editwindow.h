@@ -5,12 +5,13 @@
 #include "note.h"
 #include "QRegExpValidator"
 #include "memory"
+#include "settings.h"
 
 class EditWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit EditWindow(QWidget *parent = 0);    
+    explicit EditWindow(std::weak_ptr<Settings>, QWidget *parent = 0);
     void loadNotes(const QDate&, std::unique_ptr<QList<Note*>>);
     bool isOpened(){return this->isVisible();}
 
@@ -31,6 +32,7 @@ private slots:
     void notificationDaysTextChange(const QString);
     void showRepeatGroupBoxContent(const bool on);
     void showNotificationGroupBoxContent(const bool on);
+    void refreshDateFormat();
 
 private:
     void setUI();
@@ -39,6 +41,7 @@ private:
     void fillNoteSelector();    
     void resizeTimer();
 
+    std::shared_ptr<Settings>       settings;
     Note                *currentNote;
     QDate               currentDate;
     QVBoxLayout         *mainLayout;

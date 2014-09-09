@@ -1,8 +1,9 @@
 #include "editwindow.h"
 
-EditWindow::EditWindow( QWidget *parent) :
+EditWindow::EditWindow(std::weak_ptr<Settings> settings, QWidget *parent) :
     QWidget(parent)
 {
+    this->settings = settings.lock();
     this->setUI();
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
@@ -28,7 +29,7 @@ void EditWindow::setUI()
 
     noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     noteText->setPlaceholderText("Type in the note text here");
-    selectedDate->setDisplayFormat("dd.MM(MMM).yyyy");
+    selectedDate->setDisplayFormat(settings->dateFormat);
 
     noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
                                           QDialogButtonBox::Cancel);
@@ -363,6 +364,11 @@ void EditWindow::notificationDaysTextChange(const QString days)
     }
     else
     {
-        notificationDaysRadioButton->setText(days + " days prior to date " + selectedDate->date().addDays(-days.toInt()).toString("(dd/MM/yyyy)"));
+        notificationDaysRadioButton->setText(days + " days prior to date " + selectedDate->date().addDays(-days.toInt()).toString("("+settings->dateFormat+")"));
     }
+}
+
+void EditWindow::refreshDateFormat()
+{
+    selectedDate->setDisplayFormat(settings->dateFormat);
 }

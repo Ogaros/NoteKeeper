@@ -1,5 +1,10 @@
 #include "settings.h"
 
+Settings::Settings()
+{
+    restore();
+}
+
 void Settings::restore()
 {
     autorun = true;
@@ -27,7 +32,6 @@ void Settings::load()
     }
     else
     {
-        restore();
         save();
     }
 }

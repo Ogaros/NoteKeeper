@@ -9,6 +9,7 @@ class Settings
 {
 public:
     enum repeatedDisplay{All = 0, Future = 1, Closest = 2};
+    Settings();
     bool autorun;
     QString dateFormat;
     repeatedDisplay rDisplay;

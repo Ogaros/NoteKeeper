@@ -40,7 +40,7 @@ void MainWindow::showEditWindow()
 
 void MainWindow::createEditWindow()
 {
-    editWindow.reset(new EditWindow);
+    editWindow.reset(new EditWindow(settings));
     editWindow->setWindowFlags(editWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     connect(editWindow.get(), SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
     connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
@@ -54,6 +54,8 @@ void MainWindow::createSettingsWindow()
     settingsWindow.reset(new SettingsWindow(settings));
     settingsWindow->setWindowFlags(settingsWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     settingsWindow->hide();
+    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(refreshDateFormat()));
+    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), editWindow.get(), SLOT(refreshDateFormat()));
 }
 
 void MainWindow::setUI()
@@ -68,7 +70,7 @@ void MainWindow::setUI()
     this->createTrayIcon();
     this->createScrollArea();
 
-    noteTextTitle = new QLabel("No notes on "+cal->selectedDate().toString("dddd dd of MMMM yyyy"));
+    noteTextTitle = new QLabel("No notes on "+cal->selectedDate().toString(settings->dateFormat));
 
     leftLayout->addWidget(cal);
     leftLayout->addWidget(noteTextTitle);
@@ -265,7 +267,7 @@ void MainWindow::showNotes()
     int labelsSize = noteLabels.size();
     if(notesCount != 0)
     {
-        noteTextTitle->setText(d.toString("dddd dd of MMMM yyyy:"));
+        noteTextTitle->setText(d.toString(settings->dateFormat + ":"));
         while(notesCount > labelsSize)
         {
             addNoteLabel();
@@ -288,7 +290,7 @@ void MainWindow::showNotes()
     }
     else
     {
-        noteTextTitle->setText("No notes on "+d.toString("dddd dd of MMMM yyyy"));
+        noteTextTitle->setText("No notes on "+d.toString(settings->dateFormat));
     }
     cal->setFocus();
     resizeTimer();
@@ -525,7 +527,7 @@ void MainWindow::showClosestNote()
     Note *n = notes->findClosest(QDate::currentDate());
     if(n != nullptr)
     {
-        QString statusText = "Closest noted date" + n->date.toString("(dd/MM/yyyy): ");
+        QString statusText = "Closest noted date" + n->date.toString("("+settings->dateFormat+"):");
         QString noteTextTrimmed = n->text.trimmed();
         QString noteTextLine = noteTextTrimmed.section('\n',0,0);
         if(noteTextLine.size() > noteTextPieceSize || noteTextTrimmed.size() > noteTextLine.size())
@@ -593,7 +595,7 @@ void MainWindow::showTrayMessage()
         if(noteIndex < noteList->size())
         {
             Note* note = noteList->at(noteIndex);
-            QString Title = note->date.toString("dd/MM/yyyy");
+            QString Title = note->date.toString(settings->dateFormat);
             qint64 days = QDate::currentDate().daysTo(note->date);
             switch(days)
             {
@@ -623,4 +625,11 @@ void MainWindow::showTrayMessage()
 void MainWindow::showSettings()
 {
     settingsWindow->show();
+    settingsWindow->loadSettings();
+}
+
+void MainWindow::refreshDateFormat()
+{
+    this->showClosestNote();
+    this->showNotes();
 }
