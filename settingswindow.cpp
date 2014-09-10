@@ -1,7 +1,7 @@
 #include "settingswindow.h"
 #include "ui_settingswindow.h"
 
-SettingsWindow::SettingsWindow(std::weak_ptr<Settings> settings, QWidget *parent) :
+SettingsWindow::SettingsWindow(const std::weak_ptr<Settings> settings, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SettingsWindow)
 {
@@ -22,7 +22,7 @@ void SettingsWindow::closeEvent(QCloseEvent *event)
     this->hide();
 }
 
-void SettingsWindow::setConnections()
+void SettingsWindow::setConnections() const
 {
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonsClicked(QAbstractButton*)));
 }

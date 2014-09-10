@@ -16,9 +16,10 @@ class SettingsWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit SettingsWindow(std::weak_ptr<Settings>, QWidget *parent = 0);
-    ~SettingsWindow();
+    explicit SettingsWindow(const std::weak_ptr<Settings>, QWidget *parent = 0);
+    ~SettingsWindow();    
     void loadSettings();
+    void loadSettings(Settings *l_settings);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -30,9 +31,8 @@ signals:
     void dateFormatChanged();
 
 private:
-    void setConnections();    
-    void saveSettings();    
-    void loadSettings(Settings *l_settings);
+    void setConnections() const;
+    void saveSettings();        
     Ui::SettingsWindow *ui;
     std::shared_ptr<Settings> settings;    
 };
