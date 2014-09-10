@@ -31,7 +31,8 @@ void orgCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &d
 
         painter->restore ();
     }
-    if(notes->contains(date))
+    int count = notes->contains(date);
+    if(count > 0)
     {
         painter->save ();
         QRect circleRect = rect;
@@ -46,6 +47,10 @@ void orgCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &d
         painter->setBrush(Qt::transparent);
         painter->setRenderHint(QPainter::Antialiasing);
         painter->drawEllipse(circleRect);
+        if(count > 1)
+        {
+            painter->drawText(rect.right() - 17, rect.bottom() - 5, QString::number(count));
+        }
 
 
 
