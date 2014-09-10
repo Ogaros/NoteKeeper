@@ -176,14 +176,15 @@ std::unique_ptr<QList<Note*>> Notebook::getNotificationsFromDate(const QDate & d
     return list;
 }
 
-bool Notebook::contains(const QDate &date) const
+int Notebook::contains(const QDate &date) const
 {
+    int count = 0;
     for (auto note : notes)
     {
         if(noteOnDate(note, date))
-            return true;
+            ++count;
     }
-    return false;
+    return count;
 }
 
 bool Notebook::noteOnDate(Note * const note, const QDate & date) const

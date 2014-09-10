@@ -24,7 +24,7 @@ public:
     std::unique_ptr<QList<Note*>> getNotesFromDate(const QDate&) const;
     std::unique_ptr<QList<Note*>> getNotificationsFromDate(const QDate&) const;
     Note* findClosest(const QDate&) const;
-    bool contains (const QDate&) const;
+    int contains (const QDate&) const;
     void sort();
 
 private:
