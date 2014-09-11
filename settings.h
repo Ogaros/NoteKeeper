@@ -13,6 +13,7 @@ public:
     bool autorun;
     QString dateFormat;
     repeatedDisplay rDisplay;
+    bool showNumber;
     void restore();
     void load();
     void save();

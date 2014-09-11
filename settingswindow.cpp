@@ -67,6 +67,7 @@ void SettingsWindow::loadSettings(Settings *l_settings)
         ui->repeatedShowClosestRB->setChecked(true);
         break;
     }
+    ui->showNumberCB->setChecked(l_settings->showNumber);
 }
 
 void SettingsWindow::saveSettings()
@@ -83,5 +84,6 @@ void SettingsWindow::saveSettings()
         settings->dateFormat = ui->dateFormatEdit->text();
         emit dateFormatChanged();
     }
+    settings->showNumber = ui->showNumberCB->isChecked();
     settings->save();
 }
