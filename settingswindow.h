@@ -6,6 +6,7 @@
 #include "QAbstractButton"
 #include "settings.h"
 #include "memory"
+#include "QRegExpValidator"
 
 namespace Ui {
 class SettingsWindow;

@@ -7,6 +7,8 @@ SettingsWindow::SettingsWindow(const std::weak_ptr<Settings> settings, QWidget *
 {
     this->settings = settings.lock();
     ui->setupUi(this);
+    QRegExpValidator *dateValidator = new QRegExpValidator(QRegExp("((d{0,4}|M{0,4}|y{2}|y{4})[/\\s\\.\\:\\\\])*"));
+    ui->dateFormatEdit->setValidator(dateValidator);
     setConnections();
     loadSettings();
 }
