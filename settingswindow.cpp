@@ -7,7 +7,8 @@ SettingsWindow::SettingsWindow(const std::weak_ptr<Settings> settings, QWidget *
 {
     this->settings = settings.lock();
     ui->setupUi(this);
-    QRegExpValidator *dateValidator = new QRegExpValidator(QRegExp("((d{0,4}|M{0,4}|y{2}|y{4})[/\\s\\.\\:\\\\])*"));
+    QRegExpValidator *dateValidator = new QRegExpValidator(QRegExp("((d{0,4}|M{0,4}|y{0,4})[/\\s\\.\\:\\\\])*"));
+    //TODO: add extra y when user inputs y
     ui->dateFormatEdit->setValidator(dateValidator);
     setConnections();
     loadSettings();
@@ -75,12 +76,18 @@ void SettingsWindow::loadSettings(Settings *l_settings)
 void SettingsWindow::saveSettings()
 {
     settings->autorun = ui->startupCheckBox->isChecked();
+    Settings::repeatedDisplay rDisplay;
     if(ui->repeatedShowAllRB->isChecked())
-        settings->rDisplay = Settings::All;
+        rDisplay = Settings::All;
     else if(ui->repeatedShowFutureRB->isChecked())
-        settings->rDisplay = Settings::Future;
+        rDisplay = Settings::Future;
     else
-        settings->rDisplay = Settings::Closest;
+        rDisplay = Settings::Closest;
+    if(settings->rDisplay != rDisplay)
+    {
+        settings->rDisplay = rDisplay;
+        emit rDisplayChanged();
+    }
     if(settings->dateFormat != ui->dateFormatEdit->text())
     {
         settings->dateFormat = ui->dateFormatEdit->text();

@@ -30,6 +30,7 @@ private slots:
 
 signals:
     void dateFormatChanged();
+    void rDisplayChanged();
 
 private:
     void setConnections() const;

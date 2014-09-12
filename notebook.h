@@ -31,6 +31,7 @@ private:
     const QString filePath = QApplication::applicationDirPath() + "/OrgNotes.xml";
     bool noteOnDate(Note* const, const QDate&) const;
     bool notificationOnDate(Note* const note, const QDate&date) const;
+    QDate closestDate(Note* const note, const QDate&date) const;
     QList<Note*> notes;
     std::shared_ptr<Settings> settings;
     Note* parseNote(QXmlStreamReader&) const;

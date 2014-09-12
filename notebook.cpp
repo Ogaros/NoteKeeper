@@ -182,17 +182,29 @@ int Notebook::contains(const QDate &date) const
     for (auto note : notes)
     {
         if(noteOnDate(note, date))
+        {
             ++count;
+        }
     }
     return count;
 }
 
 bool Notebook::noteOnDate(Note * const note, const QDate & date) const
 {
-    if((note->date == date) ||
-       (note->frequency == nFrequency::Week && note->date.daysTo(date) % 7 == 0) ||
-       (note->frequency == nFrequency::Month && date.day() == note->date.day()) ||
-       (note->frequency == nFrequency::Year && date.day() == note->date.day()) && date.month() == note->date.month())
+    if(
+            (
+                (note->date == date) ||
+                (note->frequency == nFrequency::Week && note->date.daysTo(date) % 7 == 0) ||
+                (note->frequency == nFrequency::Month && date.day() == note->date.day()) ||
+                (note->frequency == nFrequency::Year && date.day() == note->date.day() && date.month() == note->date.month())
+            )
+       &&
+            (
+                (settings->rDisplay == Settings::All) ||
+                (settings->rDisplay == Settings::Future && (date >= QDate::currentDate() || note->frequency == nFrequency::Once)) ||
+                (settings->rDisplay == Settings::Closest && date == closestDate(note, QDate::currentDate()))
+            )
+      )
         return true;
     return false;
 }
@@ -210,37 +222,49 @@ bool Notebook::notificationOnDate(Note * const note, const QDate & date) const
         }
         else
         {
-            QDate (*next)(QDate&, int&);
-            if(note->frequency == nFrequency::Week)
-                next = [](QDate &d, int &sign){return d.addDays(sign * 7);};
-            else if(note->frequency == nFrequency::Month)
-                next = [](QDate &d, int &sign){return d.addMonths(sign * 1);};
-            else
-                next = [](QDate &d, int &sign){return d.addYears(sign * 1);};
-            int sign = note->date > date ? -1 : 1;
-            QDate closestDate = note->date;
-            QDate tempDate = next(closestDate, sign);
-            if(note->date > date)
-            {
-                while(tempDate >= date)
-                {
-                    closestDate = tempDate;
-                    tempDate = next(tempDate, sign);
-                }
-            }
-            else
-            {
-                while(tempDate < date)
-                {
-                    tempDate = next(tempDate, sign);
-                }
-                closestDate = tempDate;
-            }
-            note->date = closestDate;
-            return showNotification(closestDate);
+            note->date = closestDate(note, date);
+            return showNotification(note->date);
         }
     }
     return false;
+}
+
+QDate Notebook::closestDate(Note * const note, const QDate &date) const
+{
+    if(note->frequency == nFrequency::Once)
+    {
+        return note->date;
+    }
+    else
+    {
+        QDate (*next)(QDate&, int&);
+        if(note->frequency == nFrequency::Week)
+            next = [](QDate &d, int &sign){return d.addDays(sign * 7);};
+        else if(note->frequency == nFrequency::Month)
+            next = [](QDate &d, int &sign){return d.addMonths(sign * 1);};
+        else
+            next = [](QDate &d, int &sign){return d.addYears(sign * 1);};
+        int sign = note->date > date ? -1 : 1;
+        QDate closestDate = note->date;
+        QDate tempDate = next(closestDate, sign);
+        if(note->date > date)
+        {
+            while(tempDate >= date)
+            {
+                closestDate = tempDate;
+                tempDate = next(tempDate, sign);
+            }
+        }
+        else
+        {
+            while(tempDate < date)
+            {
+                tempDate = next(tempDate, sign);
+            }
+            closestDate = tempDate;
+        }
+        return closestDate;
+    }
 }
 
 bool Notebook::deleteNote(Note *note)

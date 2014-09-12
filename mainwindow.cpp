@@ -54,8 +54,10 @@ void MainWindow::createSettingsWindow()
     settingsWindow.reset(new SettingsWindow(settings));
     settingsWindow->setWindowFlags(settingsWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     settingsWindow->hide();
-    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(refreshDateFormat()));
+    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(showNotes()));
+    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(showClosestNote()));
     connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), editWindow.get(), SLOT(refreshDateFormat()));
+    connect(settingsWindow.get(), SIGNAL(rDisplayChanged()), this, SLOT(showNotes()));
 }
 
 void MainWindow::setUI()
@@ -626,10 +628,4 @@ void MainWindow::showSettings()
 {
     settingsWindow->show();
     settingsWindow->loadSettings();
-}
-
-void MainWindow::refreshDateFormat()
-{
-    this->showClosestNote();
-    this->showNotes();
 }
