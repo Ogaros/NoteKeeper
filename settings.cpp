@@ -20,6 +20,22 @@ void Settings::save()
     settings.setValue("Date_format", dateFormat);
     settings.setValue("Display_repeated", static_cast<int>(rDisplay));
     settings.setValue("showNumber", showNumber);
+    if(autorun)
+    {
+#ifdef Q_OS_WIN
+        QSettings autorunSetting("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                 QSettings::NativeFormat);
+        autorunSetting.setValue("Organizer", QCoreApplication::applicationFilePath().replace('/','\\'));
+#endif
+    }
+    else
+    {
+#ifdef Q_OS_WIN
+        QSettings autorunSetting("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                 QSettings::NativeFormat);
+        autorunSetting.remove("Organizer");
+#endif
+    }
 }
 
 void Settings::load()
