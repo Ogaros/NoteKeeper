@@ -107,15 +107,13 @@ void MainWindow::createMenu()
     QList<QAction *> fileActions;
     fileActions.append(new QAction("Save notes",this));
     fileActions.back()->setShortcut(Qt::CTRL | Qt::Key_S);
-    fileActions.append(new QAction("Import notes...",this));
-    fileActions.append(new QAction("Export notes...",this));
     fileActions.append(new QAction("Delete outdated notes",this));
     fileActions.append(new QAction("Delete all notes",this));
     QAction *settings = new QAction("Settings...", this);
 
     connect(fileActions.front(), SIGNAL(triggered()), this, SLOT(saveNotes()));
-    connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
-    connect(fileActions.at(4), SIGNAL(triggered()), this, SLOT(deleteAll()));
+    connect(fileActions.at(1), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
+    connect(fileActions.at(2), SIGNAL(triggered()), this, SLOT(deleteAll()));
     connect(settings, SIGNAL(triggered()), this, SLOT(showSettings()));
 
     fileMenu->addActions(fileActions);
