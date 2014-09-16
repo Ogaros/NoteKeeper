@@ -60,9 +60,9 @@ private:
     void addNoteLabel();
     void deleteNote(Note *);
     void resizeTimer();
+
     bool isChanged;
     bool isClosing;
-
     std::shared_ptr<Notebook>       notes;
     std::shared_ptr<Settings>       settings;
     QList<QLabel*>                  noteLabels;

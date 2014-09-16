@@ -42,6 +42,7 @@ void MainWindow::createEditWindow()
 {
     editWindow.reset(new EditWindow(settings));
     editWindow->setWindowFlags(editWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    editWindow->setWindowModality(Qt::ApplicationModal);
     connect(editWindow.get(), SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
     connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
     connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showNotes()));
@@ -512,9 +513,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else
     {
         event->ignore();
-        if(editWindow != nullptr)
-        {
+        if(editWindow->isVisible())
+        {          
             editWindow->close();
+        }
+        if(settingsWindow->isVisible())
+        {
+            settingsWindow->close();
         }
         this->hide();
         openAction->setEnabled(true);
@@ -563,11 +568,7 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
     switch(reason)
     {
     case QSystemTrayIcon::Trigger:
-        if(this->isVisible())
-        {
-            this->close();
-        }
-        else
+        if(!this->isVisible())
         {
             this->showFromTray();
         }
