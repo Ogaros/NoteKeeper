@@ -30,7 +30,6 @@ void EditWindow::setUI()
     noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     noteText->setPlaceholderText("Type in the note text here");
     selectedDate->setDisplayFormat(settings->dateFormat);
-    selectedDate->setReadOnly(true);
 
     noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
                                           QDialogButtonBox::Cancel);
