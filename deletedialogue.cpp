@@ -27,5 +27,5 @@ int DeleteDialogue::getIndex()
 
 void DeleteDialogue::setIndex()
 {
-    QObject::sender() == ui->deleteButton ? index = ui->comboBox->currentIndex() : index = -1;
+    index = QObject::sender() == ui->deleteButton ? ui->comboBox->currentIndex() : -1;
 }
