@@ -1,2 +1,2 @@
-Organizer
+Note Keeper
 =========
