@@ -1,6 +1,6 @@
-#include "orgcalendar.h"
+#include "calendar.h"
 
-orgCalendar::orgCalendar(const std::weak_ptr<Notebook> notes, const std::weak_ptr<Settings> settings, QWidget *parent) :
+Calendar::Calendar(const std::weak_ptr<Notebook> notes, const std::weak_ptr<Settings> settings, QWidget *parent) :
     QCalendarWidget(parent)
 {
     this->notes = notes.lock();    
@@ -10,7 +10,7 @@ orgCalendar::orgCalendar(const std::weak_ptr<Notebook> notes, const std::weak_pt
     this->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 }
 
-void orgCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
+void Calendar::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
 {
     QCalendarWidget::paintCell(painter, rect, date);
     int penSize = 3;
@@ -48,7 +48,7 @@ void orgCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &d
     }
 }
 
-void orgCalendar::showToday()
+void Calendar::showToday()
 {
     setSelectedDate(QDate::currentDate());
     setFocus();
