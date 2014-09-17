@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "widgetList.h"
-#include "orgcalendar.h"
+#include "calendar.h"
 #include "editwindow.h"
 #include "deletedialogue.h"
 #include "settingswindow.h"
@@ -31,6 +31,7 @@ public slots:
     void deleteAll();
     void deleteOutdated();
     void showSettings();
+    void showAbout();
     int showDeleteMessageBox(const DeleteOption);
     int showExitWOSavingMessageBox();
 
@@ -71,7 +72,7 @@ private:
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;
     QVBoxLayout                     *buttonsLayout;
-    orgCalendar                     *cal;
+    Calendar                        *cal;
     QPushButton                     *addButton;
     QPushButton                     *editButton;
     QPushButton                     *removeButton;
