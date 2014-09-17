@@ -72,6 +72,7 @@ void MainWindow::setUI()
     this->createButtonLayout();
     this->createTrayIcon();
     this->createScrollArea();
+    this->setWindowTitle("Note Keeper");
 
     noteTextTitle = new QLabel("No notes on "+cal->selectedDate().toString(settings->dateFormat));
 
@@ -121,8 +122,10 @@ void MainWindow::createMenu()
     fileMenu->addSeparator();
     fileMenu->addAction(settings);
 
-    helpMenu->addAction(new QAction("How to use...",this));
-    helpMenu->addAction(new QAction("About...",this));
+    QAction *aboutAction = new QAction("About...",this);
+    helpMenu->addAction(aboutAction);
+
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
 
     connect(this, SIGNAL(noteDeleted()), this, SLOT(showClosestNote()));
 
@@ -141,7 +144,7 @@ void MainWindow::createStatusBar()
 void MainWindow::createTrayIcon()
 {
     notificationsAction = new QAction("Show today's notifications", this);
-    openAction = new QAction("Open Organizer", this);
+    openAction = new QAction("Open Note Keeper", this);
     quitAction = new QAction("Exit", this);
 
     trayIconMenu = new QMenu(this);
@@ -157,7 +160,7 @@ void MainWindow::createTrayIcon()
     trayIcon = new QSystemTrayIcon(this);
     connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->setToolTip("Organizer");
+    trayIcon->setToolTip("Note Keeper");
 
     trayTimer = new QTimer(this);
     trayTimer->setInterval(10000);
@@ -213,7 +216,7 @@ void MainWindow::createScrollArea()
 
 void MainWindow::createCalendar()
 {
-    cal = new orgCalendar(notes, settings);
+    cal = new Calendar(notes, settings);
     cal->setMinimumSize(500, 250);
     cal->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     connect(cal, SIGNAL(selectionChanged()), this, SLOT(switchButtons()));
@@ -590,6 +593,11 @@ void MainWindow::showTrayMessage()
         {
             noteIndex = 0;
         }
+        else
+        {
+            if(QObject::sender() == notificationsAction)
+                trayIcon->showMessage("Note Keeper", "No notifications today", QSystemTrayIcon::Information, trayTimer->interval());
+        }
     }
     if(noteIndex >= 0)
     {
@@ -627,4 +635,15 @@ void MainWindow::showSettings()
 {
     settingsWindow->show();
     settingsWindow->loadSettings();
+}
+
+void MainWindow::showAbout()
+{
+    QMessageBox about(this);
+    about.setWindowTitle("About Note Keeper");
+    about.setText("Do you want to save your changes before quitting?");
+    about.setInformativeText("If you don't save your changes, they will be discarded.");
+    about.setIcon(QMessageBox::Information);
+    about.setStandardButtons(QMessageBox::Close);
+    about.exec();
 }
