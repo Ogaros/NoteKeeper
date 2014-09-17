@@ -29,10 +29,10 @@ public slots:
 
 private slots:
     void loadFields(int index = -1);
-    void notificationDaysTextChange(const QString);
     void showRepeatGroupBoxContent(const bool on);
     void showNotificationGroupBoxContent(const bool on);
     void refreshDateFormat();
+    void refreshNotificationStartDate();
 
 private:
     void setUI();

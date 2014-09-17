@@ -27,9 +27,11 @@ void EditWindow::setUI()
     noteSelectorLabel->hide();
     noteSelectorComboBox->hide();
 
-    noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    noteText->setPlaceholderText("Type in the note text here");
     selectedDate->setDisplayFormat(settings->dateFormat);
+    connect(selectedDate, SIGNAL(dateChanged(QDate)), this, SLOT(refreshNotificationStartDate()));
+
+    noteText->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    noteText->setPlaceholderText("Type in the note text here");    
 
     noteAddButtons = new QDialogButtonBox(QDialogButtonBox::Ok |
                                           QDialogButtonBox::Cancel);
@@ -119,7 +121,8 @@ void EditWindow::createNotificationGroupBox()
     notificationGroupBox->setChecked(false);
     connect(notificationGroupBox, SIGNAL(toggled(bool)), this, SLOT(showNotificationGroupBoxContent(bool)));
     connect(notificationDaysRadioButton, SIGNAL(toggled(bool)), notificationLineEdit, SLOT(setEnabled(bool)));
-    connect(notificationLineEdit, SIGNAL(textChanged(QString)), this, SLOT(notificationDaysTextChange(QString)));
+    connect(notificationLineEdit, SIGNAL(textChanged(QString)), this, SLOT(refreshNotificationStartDate()));
+    connect(notificationTodayRadioButton, SIGNAL(toggled(bool)), this, SLOT(refreshNotificationStartDate()));
 }
 
 void EditWindow::changeDate(const QDate& date)
@@ -356,15 +359,27 @@ void EditWindow::loadFields(int index)
     resizeTimer();
 }
 
-void EditWindow::notificationDaysTextChange(const QString days)
+void EditWindow::refreshNotificationStartDate()
 {
-    if(days.size() == 0)
+    if(notificationGroupBox->isChecked())
     {
-        notificationDaysRadioButton->setText("Amount of days prior to date");
-    }
-    else
-    {
-        notificationDaysRadioButton->setText(days + " days prior to date " + selectedDate->date().addDays(-days.toInt()).toString("("+settings->dateFormat+")"));
+        if(notificationDaysRadioButton->isChecked())
+        {
+            QString days = notificationLineEdit->text();
+            if(days.size() == 0)
+            {
+                notificationDaysRadioButton->setText("Amount of days prior to date");
+            }
+            else
+            {
+                notificationDaysRadioButton->setText(days + " days prior to date " + selectedDate->date().addDays(-days.toInt()).toString("("+settings->dateFormat+")"));
+            }
+        }
+        else
+        {
+            notificationDaysRadioButton->setText("Amount of days prior to date");
+            notificationLineEdit->clear();
+        }
     }
 }
 
