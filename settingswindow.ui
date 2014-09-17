@@ -24,7 +24,7 @@
    <item>
     <widget class="QCheckBox" name="startupCheckBox">
      <property name="text">
-      <string>Launch Organizer when my computer starts</string>
+      <string>Launch Note Keeper when my computer starts</string>
      </property>
     </widget>
    </item>

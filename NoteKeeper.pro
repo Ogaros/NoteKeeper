@@ -3,7 +3,7 @@ QT += widgets
 HEADERS += \
     mainwindow.h \
     main.h \
-    orgcalendar.h \
+    calendar.h \
     widgetList.h \
     note.h \
     notebook.h \
@@ -15,7 +15,7 @@ HEADERS += \
 SOURCES += \
     mainwindow.cpp \
     main.cpp \
-    orgcalendar.cpp \
+    calendar.cpp \
     note.cpp \
     notebook.cpp \
     editwindow.cpp \

@@ -25,7 +25,7 @@ void Settings::save()
 #ifdef Q_OS_WIN
         QSettings autorunSetting("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                                  QSettings::NativeFormat);
-        autorunSetting.setValue("Organizer", QCoreApplication::applicationFilePath().replace('/','\\'));
+        autorunSetting.setValue("Note Keeper", QCoreApplication::applicationFilePath().replace('/','\\'));
 #endif
     }
     else
@@ -33,7 +33,7 @@ void Settings::save()
 #ifdef Q_OS_WIN
         QSettings autorunSetting("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                                  QSettings::NativeFormat);
-        autorunSetting.remove("Organizer");
+        autorunSetting.remove("Note Keeper");
 #endif
     }
 }
