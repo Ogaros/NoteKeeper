@@ -10,6 +10,7 @@
 
 class Notebook
 {
+    friend class NoteListWindow;
 public:
     Notebook(const std::weak_ptr<Settings>);
     ~Notebook();
