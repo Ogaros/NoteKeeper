@@ -10,7 +10,8 @@ HEADERS += \
     editwindow.h \
     deletedialogue.h \
     settingswindow.h \
-    settings.h
+    settings.h \
+    notelistwindow.h
 
 SOURCES += \
     mainwindow.cpp \
@@ -21,13 +22,15 @@ SOURCES += \
     editwindow.cpp \
     deletedialogue.cpp \
     settingswindow.cpp \
-    settings.cpp
+    settings.cpp \
+    notelistwindow.cpp
 
 RESOURCES += \
     resources.qrc
 
 FORMS += \
     deletedialogue.ui \
-    SettingsWindow.ui
+    SettingsWindow.ui \
+    notelistwindow.ui
 
 CONFIG += C++11

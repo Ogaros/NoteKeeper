@@ -109,13 +109,15 @@ void MainWindow::createMenu()
     QList<QAction *> fileActions;
     fileActions.append(new QAction("Save notes",this));
     fileActions.back()->setShortcut(Qt::CTRL | Qt::Key_S);
+    fileActions.append(new QAction("Show all notes...",this));
     fileActions.append(new QAction("Delete outdated notes",this));
     fileActions.append(new QAction("Delete all notes",this));
     QAction *settings = new QAction("Settings...", this);
 
     connect(fileActions.front(), SIGNAL(triggered()), this, SLOT(saveNotes()));
-    connect(fileActions.at(1), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
-    connect(fileActions.at(2), SIGNAL(triggered()), this, SLOT(deleteAll()));
+    connect(fileActions.at(1), SIGNAL(triggered()), this, SLOT(showAllNotesWindow()));
+    connect(fileActions.at(2), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
+    connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteAll()));
     connect(settings, SIGNAL(triggered()), this, SLOT(showSettings()));
 
     fileMenu->addActions(fileActions);
@@ -646,4 +648,11 @@ void MainWindow::showAbout()
     about.setIcon(QMessageBox::Information);
     about.setStandardButtons(QMessageBox::Close);
     about.exec();
+}
+
+void MainWindow::showAllNotesWindow()
+{
+    NoteListWindow *window = new NoteListWindow(notes, settings);
+    window->setAttribute(Qt::WA_DeleteOnClose);
+    window->show();
 }

@@ -6,6 +6,7 @@
 #include "editwindow.h"
 #include "deletedialogue.h"
 #include "settingswindow.h"
+#include "notelistwindow.h"
 #include "note.h"
 #include "notebook.h"
 #include "memory"
@@ -32,6 +33,7 @@ public slots:
     void deleteOutdated();
     void showSettings();
     void showAbout();
+    void showAllNotesWindow();
     int showDeleteMessageBox(const DeleteOption);
     int showExitWOSavingMessageBox();
 
