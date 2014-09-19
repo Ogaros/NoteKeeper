@@ -279,6 +279,24 @@ void EditWindow::loadNotes(const QDate& date, std::unique_ptr<QList<Note*>> list
     }
 }
 
+void EditWindow::loadNote(Note *note)
+{
+    noteSelectorLabel->hide();
+    noteSelectorComboBox->hide();
+    if(note == nullptr)
+    {
+        currentDate = QDate::currentDate();
+        loadFields();
+    }
+    else
+    {
+        currentDate = note->date;
+        noteList.reset(new QList<Note*>);
+        noteList->append(note);
+        loadFields(0);
+    }
+}
+
 void EditWindow::loadFields(int index)
 {
     errorLabel->hide();

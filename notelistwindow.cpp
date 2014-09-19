@@ -27,22 +27,24 @@ void NoteListWindow::setConnections()
 void NoteListWindow::setupList()
 {
     QTreeWidget *list = ui->treeWidget;
+    int index = 0;
     for(auto note : notes->notes)
     {
         QTreeWidgetItem *item = new QTreeWidgetItem(list);
         item->setText(0, note->date.toString(settings->dateFormat));
         item->setText(1, note->text);
+        item->setText(10, QString::number(index));
         list->addTopLevelItem(item);
-        indexMap.emplace(list->indexOfTopLevelItem(item), note);
+        indexMap.emplace(index++, note);
     }
 }
 
 void NoteListWindow::edit()
 {
-    emit editNote(indexMap[ui->treeWidget->indexOfTopLevelItem(ui->treeWidget->selectedItems().first())]);
+    emit editNote(indexMap[ui->treeWidget->selectedItems().first()->text(10).toInt()]);
 }
 
 void NoteListWindow::remove()
 {
-    emit deleteNote(indexMap[ui->treeWidget->indexOfTopLevelItem(ui->treeWidget->selectedItems().first())]);
+    emit deleteNote(indexMap[ui->treeWidget->selectedItems().first()->text(10).toInt()]);
 }

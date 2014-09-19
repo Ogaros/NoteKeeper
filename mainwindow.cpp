@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     showTrayMessage();
 }
 
-void MainWindow::showEditWindow()
+void MainWindow::showEditWindow(Note *note)
 {
     const QDate d = cal->selectedDate();
     if(QObject::sender() == addButton)
@@ -32,6 +32,10 @@ void MainWindow::showEditWindow()
     else if(QObject::sender() == editButton)
     {
         editWindow->loadNotes(d, notes->getNotesFromDate(d));
+    }
+    else //Edit button in NoteListWindow
+    {
+        editWindow->loadNote(note);
     }
     editWindow->show();
     editWindow->activateWindow();
@@ -410,6 +414,14 @@ void MainWindow::deleteNoteDialogue()
     cal->setFocus();
 }
 
+void MainWindow::deleteNoteFromListWindow(Note *note)
+{
+    if(showDeleteMessageBox(DeleteOption::One) == QMessageBox::Yes)
+    {
+        deleteNote(note);
+    }
+}
+
 void MainWindow::deleteNote(Note * note)
 {
     notes->deleteNote(note);
@@ -654,5 +666,7 @@ void MainWindow::showAllNotesWindow()
 {
     NoteListWindow *window = new NoteListWindow(notes, settings);
     window->setAttribute(Qt::WA_DeleteOnClose);
+    connect(window, SIGNAL(editNote(Note*)), this, SLOT(showEditWindow(Note*)));
+    connect(window, SIGNAL(deleteNote(Note*)), this, SLOT(deleteNote(Note*)));
     window->show();
 }

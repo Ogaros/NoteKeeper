@@ -23,12 +23,13 @@ signals:
     void noteDeleted();
 
 public slots:
-    void showEditWindow();
+    void showEditWindow(Note *note = nullptr);
     void addNote(Note *n, const bool);
     void showNotes();
     void showClosestNote();
     void saveNotes();
     void deleteNoteDialogue();
+    void deleteNoteFromListWindow(Note *);
     void deleteAll();
     void deleteOutdated();
     void showSettings();
@@ -42,6 +43,7 @@ private slots:
     void resizeMe();
     void closeProgram();
     void showFromTray();
+    void deleteNote(Note *);
     void iconActivated(QSystemTrayIcon::ActivationReason);
     void showTrayMessage();
 
@@ -60,8 +62,7 @@ private:
     void createScrollArea();
     void createEditWindow();
     void createSettingsWindow();
-    void addNoteLabel();
-    void deleteNote(Note *);
+    void addNoteLabel();    
     void resizeTimer();
 
     bool isChanged;

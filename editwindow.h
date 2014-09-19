@@ -13,6 +13,7 @@ class EditWindow : public QWidget
 public:
     explicit EditWindow(std::weak_ptr<Settings>, QWidget *parent = 0);
     void loadNotes(const QDate&, std::unique_ptr<QList<Note*>>);
+    void loadNote(Note *);
     bool isOpened(){return this->isVisible();}
 
 protected:
