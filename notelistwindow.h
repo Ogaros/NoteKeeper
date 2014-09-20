@@ -5,6 +5,7 @@
 #include "notebook.h"
 #include "memory"
 #include "settings.h"
+#include "QTreeWidgetItem"
 
 
 namespace Ui {
@@ -22,10 +23,15 @@ public:
 private:
     void setConnections();
     void setupList();
+    void setupItem(Note *, QTreeWidgetItem *);
     Ui::NoteListWindow *ui;
     std::shared_ptr<Notebook> notes;
     std::shared_ptr<Settings> settings;
     std::map<int, Note*> indexMap;
+
+public slots:
+    void updateItem();
+    void deleteItem();
 
 private slots:
     void edit();
@@ -34,7 +40,6 @@ private slots:
 signals:
     void editNote(Note *);
     void deleteNote(Note *);
-    void addNote();
 };
 
 #endif // NOTELISTWINDOW_H
