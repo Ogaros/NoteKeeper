@@ -44,6 +44,11 @@
        <string>Repeated</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Notification</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
