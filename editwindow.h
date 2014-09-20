@@ -22,6 +22,7 @@ protected:
 signals:
     void noteAdded(Note*, const bool);
     void noteAdded(const QDate&);
+    void noteEdited();
 
 public slots:    
     void changeDate(const QDate& date);

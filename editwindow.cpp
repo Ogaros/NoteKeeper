@@ -238,6 +238,10 @@ void EditWindow::addNote()
                       daysPrior;
         emit noteAdded(n, isNew);
         emit noteAdded(n->date);
+        if(!isNew)
+        {
+            emit noteEdited();
+        }
         this->hide();
     }
 }

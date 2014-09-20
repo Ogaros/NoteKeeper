@@ -668,5 +668,7 @@ void MainWindow::showAllNotesWindow()
     window->setAttribute(Qt::WA_DeleteOnClose);
     connect(window, SIGNAL(editNote(Note*)), this, SLOT(showEditWindow(Note*)));
     connect(window, SIGNAL(deleteNote(Note*)), this, SLOT(deleteNote(Note*)));
+    connect(this, SIGNAL(noteDeleted()), window, SLOT(deleteItem()));
+    connect(editWindow.get(), SIGNAL(noteEdited()), window, SLOT(updateItem()));
     window->show();
 }
