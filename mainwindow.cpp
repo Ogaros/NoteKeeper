@@ -655,8 +655,8 @@ void MainWindow::showAbout()
 {
     QMessageBox about(this);
     about.setWindowTitle("About Note Keeper");
-    about.setText("Do you want to save your changes before quitting?");
-    about.setInformativeText("If you don't save your changes, they will be discarded.");
+    about.setText("Note Keeper ver. 1.0");
+    about.setInformativeText("Made by Fedor Rebenkov");
     about.setIcon(QMessageBox::Information);
     about.setStandardButtons(QMessageBox::Close);
     about.exec();
