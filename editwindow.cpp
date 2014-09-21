@@ -394,7 +394,8 @@ void EditWindow::refreshNotificationStartDate()
             }
             else
             {
-                notificationDaysRadioButton->setText(days + " days prior to date " + selectedDate->date().addDays(-days.toInt()).toString("("+settings->dateFormat+")"));
+                days += days.toInt() == 1 ? " day" : " days";
+                notificationDaysRadioButton->setText(days + " prior to date " + selectedDate->date().addDays(-days.toInt()).toString("("+settings->dateFormat+")"));
             }
         }
         else

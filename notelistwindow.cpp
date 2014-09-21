@@ -72,7 +72,13 @@ void NoteListWindow::setupItem(Note *note, QTreeWidgetItem *item)
     }
     item->setText(2, frequency);
     QString notification;
-    notification = note->notifEnabled ? QString::number(note->daysPrior)+" days prior" : "no";
+    if(note->notifEnabled)
+    {
+        notification = QString::number(note->daysPrior);
+        notification += note->daysPrior == 1 ? " day prior" : " days prior";
+    }
+    else
+        notification = "no";
     item->setText(3, notification);
 }
 
