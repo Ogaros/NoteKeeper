@@ -34,3 +34,5 @@ FORMS += \
     notelistwindow.ui
 
 CONFIG += C++11
+
+win32:RC_ICONS += images/Calendar.ico
