@@ -100,7 +100,7 @@ void MainWindow::setUI()
     this->switchButtons();
     this->showNotes();
     this->showClosestNote();
-    this->setWindowIcon(QIcon(":/images/icon.tga"));
+    this->setWindowIcon(QIcon(":/images/icon"));
     connect(this, SIGNAL(noteDeleted()), this, SLOT(switchButtons()));
 }
 
@@ -175,7 +175,7 @@ void MainWindow::createTrayIcon()
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showTrayMessage()));
 
     // TODO: Make real icon.
-    trayIcon->setIcon(QIcon(":/images/icon.tga"));
+    trayIcon->setIcon(QIcon(":/images/icon"));
     trayIcon->show();
 }
 
