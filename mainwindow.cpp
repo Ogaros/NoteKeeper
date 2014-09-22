@@ -174,7 +174,6 @@ void MainWindow::createTrayIcon()
     connect(trayTimer, SIGNAL(timeout()), this, SLOT(showTrayMessage()));
     connect(trayIcon, SIGNAL(messageClicked()), this, SLOT(showTrayMessage()));
 
-    // TODO: Make real icon.
     trayIcon->setIcon(QIcon(":/images/icon"));
     trayIcon->show();
 }
@@ -340,7 +339,6 @@ void MainWindow::resizeMe()
             if(label->isEnabled())
             {
                 label->adjustSize();
-                //TODO: fix line size hack
                 label->setFixedWidth(scrollArea->widget()->width() - scrollLayout->margin() * 2 - 20);
                 scrollAreaHeight += label->frameGeometry().height() + label->margin();
             }
