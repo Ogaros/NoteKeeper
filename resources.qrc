@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/images">
         <file alias="icon">images/Calendar.ico</file>
+        <file alias="qMarkIcon">images/QuestionMark.ico</file>
     </qresource>
 </RCC>
