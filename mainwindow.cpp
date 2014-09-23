@@ -651,13 +651,32 @@ void MainWindow::showSettings()
 
 void MainWindow::showAbout()
 {
-    QMessageBox about(this);
-    about.setWindowTitle("About Note Keeper");
-    about.setText("Note Keeper ver. 1.0");
-    about.setInformativeText("Made by Fedor Rebenkov");
-    about.setIcon(QMessageBox::Information);
-    about.setStandardButtons(QMessageBox::Close);
-    about.exec();
+    QWidget *about = new QWidget;
+    QLabel *icon = new QLabel;
+    icon->setPixmap(QIcon(":/images/icon").pixmap(64,64));
+    QLabel *text = new QLabel("Note Keeper ver. 1.0\n\nMade by Fedor Rebenkov");
+    QFont font;
+    font.setPointSize(10);
+    text->setFont(font);
+    QPushButton *close = new QPushButton("Close");
+    QVBoxLayout *layout = new QVBoxLayout;
+    QHBoxLayout *textIcon = new QHBoxLayout;
+    textIcon->addWidget(icon);
+    textIcon->addWidget(text);
+    layout->addLayout(textIcon);
+    layout->addWidget(close,0,Qt::AlignRight);
+    connect(close, SIGNAL(clicked()), about, SLOT(close()));
+    about->setLayout(layout);
+    about->setWindowTitle("About Note Keeper");
+    about->setAttribute(Qt::WA_DeleteOnClose);
+    about->setWindowFlags(about->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    about->setWindowModality(Qt::ApplicationModal);
+    about->show();
+    int aw = about->width();
+    int ah = about->height();
+    int ww = this->width();
+    int wh = this->height();
+    about->move(ww/2 - aw/2 + this->x(), wh/2 - ah/2 + this->y());
 }
 
 void MainWindow::showAllNotesWindow()
