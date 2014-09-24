@@ -27,6 +27,7 @@ protected:
 
 private slots:
     void buttonsClicked(QAbstractButton*);
+    void formatChanged(QString);
 
 signals:
     void dateFormatChanged();
@@ -34,9 +35,11 @@ signals:
 
 private:
     void setConnections() const;
-    void saveSettings();        
+    void saveSettings();
+    int strDiff(QString&, QString&);
     Ui::SettingsWindow *ui;
     std::shared_ptr<Settings> settings;    
+    QString prevFormat;
 };
 
 #endif // SETTINGSWINDOW_H

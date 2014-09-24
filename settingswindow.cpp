@@ -8,7 +8,6 @@ SettingsWindow::SettingsWindow(const std::weak_ptr<Settings> settings, QWidget *
     this->settings = settings.lock();
     ui->setupUi(this);
     QRegExpValidator *dateValidator = new QRegExpValidator(QRegExp("((d{0,4}|M{0,4}|y{0,4})[/\\s\\.\\,\\:\\\\])*"));
-    //TODO: add extra y when user inputs y
     ui->dateFormatEdit->setValidator(dateValidator);    
     ui->iconLabel->setPixmap(QIcon(":/images/qMarkIcon").pixmap(20,20));
     ui->iconLabel->setToolTip("Date format can be formedwith the following expressions:<br>"
@@ -28,6 +27,7 @@ SettingsWindow::SettingsWindow(const std::weak_ptr<Settings> settings, QWidget *
                               "<br>the expressions.");
     setConnections();
     loadSettings();
+    prevFormat = ui->dateFormatEdit->text();
 }
 
 SettingsWindow::~SettingsWindow()
@@ -44,6 +44,7 @@ void SettingsWindow::closeEvent(QCloseEvent *event)
 void SettingsWindow::setConnections() const
 {
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonsClicked(QAbstractButton*)));
+    connect(ui->dateFormatEdit, SIGNAL(textEdited(QString)), this, SLOT(formatChanged(QString)));
 }
 
 void SettingsWindow::buttonsClicked(QAbstractButton *button)
@@ -111,4 +112,55 @@ void SettingsWindow::saveSettings()
     }
     settings->showNumber = ui->showNumberCB->isChecked();
     settings->save();
+}
+
+void SettingsWindow::formatChanged(QString newFormat)
+{
+    int index = strDiff(prevFormat, newFormat);
+    if(index < 0)
+    {
+        prevFormat = newFormat;
+        return;
+    }
+    bool deleted;
+    if(newFormat.size() >= prevFormat.size() && newFormat[index] == 'y')
+        deleted = false;
+    else if(newFormat.size() <= prevFormat.size() && prevFormat[index] == 'y')
+        deleted = true;
+    else
+    {
+        prevFormat = newFormat;
+        return;
+    }
+    if(deleted)
+    {
+        if(index == 0 || (index < prevFormat.size()-1 && prevFormat[index+1] == 'y'))
+            newFormat.remove(index, 1);
+        else
+            newFormat.remove(index - 1, 1);
+    }
+    else
+    {
+        newFormat.insert(index, 'y');
+    }
+    ui->dateFormatEdit->setText(newFormat);
+    ui->dateFormatEdit->setCursorPosition(deleted ? index - 1 : index + 2);
+    prevFormat = newFormat;
+}
+
+int SettingsWindow::strDiff(QString &first, QString &second)
+{
+    int fSize = first.size();
+    int sSize = second.size();
+    int size = fSize < sSize ? fSize : sSize;
+    for(int i = 0; i < size; i++)
+    {
+        if(first[i] != second[i])
+        {
+            return i;
+        }
+    }
+    if(fSize != sSize)
+        return fSize > sSize ? fSize - 1 : sSize - 1;
+    return -1;
 }
