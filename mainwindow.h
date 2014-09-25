@@ -44,6 +44,7 @@ private slots:
     void closeProgram();
     void showFromTray();
     void deleteNote(Note *);
+    void deleteNotes(std::shared_ptr<QList<Note*>>);
     void iconActivated(QSystemTrayIcon::ActivationReason);
     void showTrayMessage();
 

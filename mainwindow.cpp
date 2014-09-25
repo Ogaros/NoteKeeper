@@ -374,7 +374,7 @@ void MainWindow::saveNotes()
 
 void MainWindow::deleteNoteDialogue()
 {
-    auto list = notes->getNotesFromDate(cal->selectedDate());
+    auto list = std::move(notes->getNotesFromDate(cal->selectedDate()));
     if(list->size() == 1)
     {
         int i = showDeleteMessageBox(DeleteOption::One);
@@ -384,30 +384,12 @@ void MainWindow::deleteNoteDialogue()
         }
     }
     else
-    {
-        QStringList listTexts;
-        for(auto note : *list)
-        {
-            QString textTrimmed = note->text.trimmed();
-            QString textCropped = textTrimmed.left(50);
-            if(textTrimmed.size() > textCropped.size())
-            {
-                textCropped += "...";
-            }
-            listTexts.append(textCropped);
-        }
-        std::unique_ptr<DeleteDialogue> dialogue(new DeleteDialogue(listTexts));
-        dialogue->setWindowFlags(dialogue->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-        moveToCenter(dialogue.get());
+    {        
+        DeleteDialogue *dialogue = new DeleteDialogue(std::move(list));
+        dialogue->setAttribute(Qt::WA_DeleteOnClose);
+        connect(dialogue, SIGNAL(deleteNotes(std::shared_ptr<QList<Note*>>)), this, SLOT(deleteNotes(std::shared_ptr<QList<Note*>>)));
         dialogue->show();
-        QEventLoop loop;
-        connect(dialogue.get(), SIGNAL(ready()), &loop, SLOT(quit()));
-        loop.exec();
-        int index = dialogue->getIndex();
-        if(index >= 0)
-        {
-            deleteNote(list->at(index));
-        }
+        moveToCenter(dialogue);
     }
     cal->setFocus();
 }
@@ -423,6 +405,17 @@ void MainWindow::deleteNoteFromListWindow(Note *note)
 void MainWindow::deleteNote(Note * note)
 {
     notes->deleteNote(note);
+    this->showNotes();
+    isChanged = true;
+    emit noteDeleted();
+}
+
+void MainWindow::deleteNotes(std::shared_ptr<QList<Note *>> noteList)
+{
+    for(auto note : *noteList)
+    {
+        notes->deleteNote(note);
+    }
     this->showNotes();
     isChanged = true;
     emit noteDeleted();
