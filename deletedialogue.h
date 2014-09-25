@@ -2,6 +2,9 @@
 #define DELETEDIALOGUE_H
 
 #include <QWidget>
+#include <memory>
+#include "note.h"
+#include "QTreeWidgetItem"
 
 namespace Ui {
 class DeleteDialogue;
@@ -12,19 +15,21 @@ class DeleteDialogue : public QWidget
     Q_OBJECT
 
 public:
-    explicit DeleteDialogue(QStringList, QWidget *parent = 0);
+    explicit DeleteDialogue(std::unique_ptr<QList<Note*>>, QWidget *parent = 0);
     ~DeleteDialogue();
-    int getIndex();
-
-private slots:
-    void setIndex();
 
 signals:
-    void ready();
+    void deleteNotes(std::shared_ptr<QList<Note*>>);
+
+private slots:
+    void sendDeleteList();
 
 private:
-    Ui::DeleteDialogue *ui;    
-    int index;
+    void setupList();
+    void setupItem(Note*, QTreeWidgetItem*);
+    Ui::DeleteDialogue *ui;
+    std::unique_ptr<QList<Note*>> notes;
+    std::map<int, Note*> indexMap;
 };
 
 #endif // DELETEDIALOGUE_H
