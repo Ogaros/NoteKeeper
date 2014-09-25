@@ -8,6 +8,8 @@ NoteListWindow::NoteListWindow(const std::weak_ptr<Notebook> notes, const std::w
     this->notes = notes.lock();
     this->settings = settings.lock();
     ui->setupUi(this);
+    ui->treeWidget->header()->setSectionsMovable(false);
+    ui->treeWidget->sortItems(0, Qt::AscendingOrder);
     setupList();
     setConnections();
 }
@@ -30,7 +32,7 @@ void NoteListWindow::setupList()
     int index = 0;
     for(auto note : notes->notes)
     {
-        QTreeWidgetItem *item = new QTreeWidgetItem(list);
+        NoteTreeItem *item = new NoteTreeItem(settings);
         setupItem(note, item);
         item->setText(10, QString::number(index));
         list->addTopLevelItem(item);
@@ -96,4 +98,44 @@ void NoteListWindow::remove()
     QTreeWidgetItem *item = ui->treeWidget->currentItem();
     if(item != nullptr)
         emit deleteNote(indexMap[item->text(10).toInt()]);
+}
+
+NoteTreeItem::NoteTreeItem(const std::weak_ptr<Settings> settings)
+{
+    this->settings = settings.lock();
+    frequencyMap.emplace("no", 0);
+    frequencyMap.emplace("weekly", 1);
+    frequencyMap.emplace("monthly", 2);
+    frequencyMap.emplace("yearly", 3);
+}
+
+bool NoteTreeItem::operator <(const QTreeWidgetItem &other) const
+{
+    int column = treeWidget()->sortColumn();
+    QString thisText = text(column);
+    QString otherText = other.text(column);
+    switch(column)
+    {
+    case 0: //Date
+        return QDate::fromString(thisText, settings->dateFormat) < QDate::fromString(otherText, settings->dateFormat);
+    case 1: //Text
+        return thisText < otherText;
+    case 2: //Frequency
+        return frequencyMap.at(thisText) < frequencyMap.at(otherText);
+    case 3: //Notification
+        {
+            if(thisText == "no" && otherText != "no")
+                return true;
+            else if(otherText == "no")
+                return false;
+            else
+            {
+                QString aaa = thisText.section(' ',0,0);
+                QString bbb = otherText.section(' ',0,0);
+                return aaa.toInt() < bbb.toInt();
+            }
+        }
+    default:
+        throw std::logic_error("sorting non-existing row");
+    }
 }
