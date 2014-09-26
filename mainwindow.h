@@ -21,10 +21,11 @@ public:
 
 signals:
     void noteDeleted();
+    void noteEdited();
 
 public slots:
     void showEditWindow(Note *note = nullptr);
-    void addNote(Note *n, const bool);
+    void addNote(Note *n);
     void showNotes();
     void showClosestNote();
     void saveNotes();
@@ -61,7 +62,6 @@ private:
     void createButtonLayout();
     void createCalendar();
     void createScrollArea();
-    void createEditWindow();
     void createSettingsWindow();
     void addNoteLabel();    
     void resizeTimer();
@@ -71,7 +71,6 @@ private:
     std::shared_ptr<Notebook>       notes;
     std::shared_ptr<Settings>       settings;
     QList<QLabel*>                  noteLabels;
-    std::unique_ptr<EditWindow>     editWindow;
     std::unique_ptr<SettingsWindow> settingsWindow;    
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;

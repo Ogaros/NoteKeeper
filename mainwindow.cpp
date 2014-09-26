@@ -4,7 +4,7 @@ static const int windowSizeX = 650;
 static const int windowSizeY = 300;
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), isChanged(false), isClosing(false), editWindow(nullptr)
+    QMainWindow(parent), isChanged(false), isClosing(false)
 {
     try
     {
@@ -17,41 +17,37 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::critical(parent, "MainWindow::MainWindow", QString::fromLocal8Bit(e.what()));
     }
     this->setUI();
-    createEditWindow();
     createSettingsWindow();
     showTrayMessage();
 }
 
 void MainWindow::showEditWindow(Note *note)
 {
+    EditWindow *window = new EditWindow(settings);
+    window->setWindowFlags(window->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    window->setWindowModality(Qt::ApplicationModal);
+    window->setAttribute(Qt::WA_DeleteOnClose);
+    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(addNote(Note*)));
+    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(showNotes()));
+    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(showClosestNote()));
+    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(switchButtons()));
+    connect(window, SIGNAL(noteEdited()), this, SIGNAL(noteEdited()));
     const QDate d = cal->selectedDate();
     if(QObject::sender() == addButton)
     {
-        editWindow->loadNotes(d, nullptr);
+        window->loadNotes(d, nullptr);
     }
     else if(QObject::sender() == editButton)
     {
-        editWindow->loadNotes(d, notes->getNotesFromDate(d));
+        window->loadNotes(d, notes->getNotesFromDate(d));
     }
     else //Edit button in NoteListWindow
     {
-        editWindow->loadNote(note);
+        window->loadNote(note);
     }
-    editWindow->show();
-    editWindow->activateWindow();
-    MainWindow::moveToCenter(editWindow.get());
-}
-
-void MainWindow::createEditWindow()
-{
-    editWindow.reset(new EditWindow(settings));
-    editWindow->setWindowFlags(editWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-    editWindow->setWindowModality(Qt::ApplicationModal);
-    connect(editWindow.get(), SIGNAL(noteAdded(Note*, const bool)), this, SLOT(addNote(Note*, const bool)));
-    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), cal, SLOT(setSelectedDate(const QDate&)));
-    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showNotes()));
-    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(showClosestNote()));
-    connect(editWindow.get(), SIGNAL(noteAdded(const QDate&)), this, SLOT(switchButtons()));
+    window->show();
+    window->activateWindow();
+    moveToCenter(window);
 }
 
 void MainWindow::createSettingsWindow()
@@ -61,7 +57,6 @@ void MainWindow::createSettingsWindow()
     settingsWindow->hide();
     connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(showNotes()));
     connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(showClosestNote()));
-    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), editWindow.get(), SLOT(refreshDateFormat()));
     connect(settingsWindow.get(), SIGNAL(rDisplayChanged()), this, SLOT(showNotes()));
 }
 
@@ -239,30 +234,15 @@ void MainWindow::moveToCenter(QWidget *window)
     window->move(dw/2 - ww/2, dh/2 - wh/2);
 }
 
-void MainWindow::addNote(Note *n, const bool isNew)
+void MainWindow::addNote(Note *n)
 {
-    if(isNew)
+    try
     {
-        try
-        {
-            notes->addNote(n);
-        }
-        catch(std::exception& e)
-        {
-            QMessageBox::critical(this, "Notebook::addNote", QString::fromLocal8Bit(e.what()));
-        }
+        notes->addNote(n);
     }
-    else
+    catch(std::exception& e)
     {
-        try
-        {
-            notes->sort();
-        }
-        catch(std::exception& e)
-        {
-            QMessageBox::critical(this, "Notebook::sort", QString::fromLocal8Bit(e.what()));
-            qApp->quit();
-        }
+        QMessageBox::critical(this, "Notebook::addNote", QString::fromLocal8Bit(e.what()));
     }
     isChanged = true;
 }
@@ -367,7 +347,7 @@ void MainWindow::saveNotes()
     }
     catch(std::exception& e)
     {
-        QMessageBox::critical(this, "Notebook::loadNotes", QString::fromLocal8Bit(e.what()));
+        QMessageBox::critical(this, "Notebook::saveNotes", QString::fromLocal8Bit(e.what()));
     }
     isChanged = false;
 }
@@ -521,10 +501,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else
     {
         event->ignore();
-        if(editWindow->isVisible())
-        {          
-            editWindow->close();
-        }
         if(settingsWindow->isVisible())
         {
             settingsWindow->close();
@@ -679,6 +655,6 @@ void MainWindow::showAllNotesWindow()
     connect(window, SIGNAL(editNote(Note*)), this, SLOT(showEditWindow(Note*)));
     connect(window, SIGNAL(deleteNote(Note*)), this, SLOT(deleteNote(Note*)));
     connect(this, SIGNAL(noteDeleted()), window, SLOT(deleteItem()));
-    connect(editWindow.get(), SIGNAL(noteEdited()), window, SLOT(updateItem()));
+    connect(this, SIGNAL(noteEdited()), window, SLOT(updateItem()));
     window->show();
 }
