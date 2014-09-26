@@ -125,11 +125,6 @@ void EditWindow::createNotificationGroupBox()
     connect(notificationTodayRadioButton, SIGNAL(toggled(bool)), this, SLOT(refreshNotificationStartDate()));
 }
 
-void EditWindow::changeDate(const QDate& date)
-{
-    selectedDate->setDate(date);
-}
-
 void EditWindow::showRepeatGroupBoxContent(const bool on)
 {
     repeatWeekRadioButton->setVisible(on);
@@ -236,12 +231,10 @@ void EditWindow::addNote()
         n->daysPrior = notificationTodayRadioButton->isChecked() ?
                       abs(date.daysTo(QDate::currentDate())) :
                       daysPrior;
-        emit noteAdded(n, isNew);
-        emit noteAdded(n->date);
-        if(!isNew)
-        {
+        if(isNew)
+            emit noteAdded(n);
+        else
             emit noteEdited();
-        }
         this->hide();
     }
 }
@@ -404,9 +397,4 @@ void EditWindow::refreshNotificationStartDate()
             notificationLineEdit->clear();
         }
     }
-}
-
-void EditWindow::refreshDateFormat()
-{
-    selectedDate->setDisplayFormat(settings->dateFormat);
 }

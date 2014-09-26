@@ -15,7 +15,7 @@ public:
     Notebook(const std::weak_ptr<Settings>);
     ~Notebook();
     void loadNotes();
-    void saveNotes() const;
+    void saveNotes();
     void addNote(Note *n);
     void addNote(const QDate date, const QString text, const nFrequency frequency,
                  const bool notifEnabled, const int daysPrior);

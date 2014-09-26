@@ -110,8 +110,16 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
     return n;
 }
 
-void Notebook::saveNotes() const
+void Notebook::saveNotes()
 {
+    try
+    {
+        sort();
+    }
+    catch(...)
+    {
+        throw;
+    }
     QFile file(filePath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
         throw std::runtime_error("Failed to open OrgNotes.xml");

@@ -14,18 +14,15 @@ public:
     explicit EditWindow(std::weak_ptr<Settings>, QWidget *parent = 0);
     void loadNotes(const QDate&, std::unique_ptr<QList<Note*>>);
     void loadNote(Note *);
-    bool isOpened(){return this->isVisible();}
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 signals:
-    void noteAdded(Note*, const bool);
-    void noteAdded(const QDate&);
+    void noteAdded(Note*);
     void noteEdited();
 
 public slots:    
-    void changeDate(const QDate& date);
     void resizeMe();
     void addNote();
 
@@ -33,7 +30,6 @@ private slots:
     void loadFields(int index = -1);
     void showRepeatGroupBoxContent(const bool on);
     void showNotificationGroupBoxContent(const bool on);
-    void refreshDateFormat();
     void refreshNotificationStartDate();
 
 private:
@@ -46,6 +42,8 @@ private:
     std::shared_ptr<Settings>       settings;
     Note                *currentNote;
     QDate               currentDate;
+    std::unique_ptr<QList<Note*>> noteList;
+
     QVBoxLayout         *mainLayout;
     QLabel              *dateLabel;
     QDateEdit           *selectedDate;
@@ -68,7 +66,7 @@ private:
     QButtonGroup        *notificationRadioButtonGroup;
     QLabel              *errorLabel;
     QDialogButtonBox    *noteAddButtons;
-    std::unique_ptr<QList<Note*>> noteList;
+
 };
 
 #endif // EDITWINDOW_H
