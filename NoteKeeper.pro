@@ -11,7 +11,8 @@ HEADERS += \
     deletedialogue.h \
     settingswindow.h \
     settings.h \
-    notelistwindow.h
+    notelistwindow.h \
+    notetreeitem.h
 
 SOURCES += \
     mainwindow.cpp \
