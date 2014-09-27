@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
         QMessageBox::critical(parent, "MainWindow::MainWindow", QString::fromLocal8Bit(e.what()));
     }
     this->setUI();
-    createSettingsWindow();
     showTrayMessage();
 }
 
@@ -48,16 +47,6 @@ void MainWindow::showEditWindow(Note *note)
     window->show();
     window->activateWindow();
     moveToCenter(window);
-}
-
-void MainWindow::createSettingsWindow()
-{
-    settingsWindow.reset(new SettingsWindow(settings));
-    settingsWindow->setWindowFlags(settingsWindow->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-    settingsWindow->hide();
-    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(showNotes()));
-    connect(settingsWindow.get(), SIGNAL(dateFormatChanged()), this, SLOT(showClosestNote()));
-    connect(settingsWindow.get(), SIGNAL(rDisplayChanged()), this, SLOT(showNotes()));
 }
 
 void MainWindow::setUI()
@@ -117,7 +106,7 @@ void MainWindow::createMenu()
     connect(fileActions.at(1), SIGNAL(triggered()), this, SLOT(showAllNotesWindow()));
     connect(fileActions.at(2), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
     connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteAll()));
-    connect(settings, SIGNAL(triggered()), this, SLOT(showSettings()));
+    connect(settings, SIGNAL(triggered()), this, SLOT(showSettingsWindow()));
 
     fileMenu->addActions(fileActions);
     fileMenu->addSeparator();
@@ -501,10 +490,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else
     {
         event->ignore();
-        if(settingsWindow->isVisible())
-        {
-            settingsWindow->close();
-        }
         this->hide();
         openAction->setEnabled(true);
     }
@@ -612,10 +597,17 @@ void MainWindow::showTrayMessage()
     }
 }
 
-void MainWindow::showSettings()
+void MainWindow::showSettingsWindow()
 {
-    settingsWindow->show();
-    settingsWindow->loadSettings();
+    SettingsWindow *window = new SettingsWindow(settings);
+    window->setWindowFlags(window->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    window->setWindowModality(Qt::ApplicationModal);
+    window->setAttribute(Qt::WA_DeleteOnClose);
+    connect(window, SIGNAL(dateFormatChanged()), this, SLOT(showNotes()));
+    connect(window, SIGNAL(dateFormatChanged()), this, SLOT(showClosestNote()));
+    connect(window, SIGNAL(rDisplayChanged()), this, SLOT(showNotes()));
+    window->loadSettings();
+    window->show();
 }
 
 void MainWindow::showAbout()

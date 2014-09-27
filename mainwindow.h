@@ -33,7 +33,7 @@ public slots:
     void deleteNoteFromListWindow(Note *);
     void deleteAll();
     void deleteOutdated();
-    void showSettings();
+    void showSettingsWindow();
     void showAbout();
     void showAllNotesWindow();
     int showDeleteMessageBox(const DeleteOption);
@@ -62,16 +62,16 @@ private:
     void createButtonLayout();
     void createCalendar();
     void createScrollArea();
-    void createSettingsWindow();
     void addNoteLabel();    
     void resizeTimer();
 
     bool isChanged;
     bool isClosing;
     std::shared_ptr<Notebook>       notes;
-    std::shared_ptr<Settings>       settings;
+    std::shared_ptr<Settings>       settings;    
+
+    //Interface
     QList<QLabel*>                  noteLabels;
-    std::unique_ptr<SettingsWindow> settingsWindow;    
     QHBoxLayout                     *mainLayout;
     QVBoxLayout                     *leftLayout;
     QVBoxLayout                     *buttonsLayout;
