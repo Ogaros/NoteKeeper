@@ -1,11 +1,11 @@
 #ifndef NOTELISTWINDOW_H
 #define NOTELISTWINDOW_H
 
-#include <QWidget>
+#include "QWidget"
 #include "notebook.h"
 #include "memory"
 #include "settings.h"
-#include <QTreeWidgetItem>
+#include "notetreeitem.h"
 
 
 namespace Ui {
@@ -27,7 +27,7 @@ private:
     Ui::NoteListWindow *ui;
     std::shared_ptr<Notebook> notes;
     std::shared_ptr<Settings> settings;
-    std::map<int, Note*> indexMap;
+    std::map<int, Note*> indexMap;    
 
 public slots:
     void updateItem();
@@ -40,16 +40,6 @@ private slots:
 signals:
     void editNote(Note *);
     void deleteNote(Note *);
-};
-
-class NoteTreeItem : public QTreeWidgetItem
-{
-public:
-    NoteTreeItem(const std::weak_ptr<Settings> settings);
-private:
-    std::shared_ptr<Settings> settings;
-    std::map<QString, int> frequencyMap;
-    bool operator <(const QTreeWidgetItem &other) const;
 };
 
 #endif // NOTELISTWINDOW_H
