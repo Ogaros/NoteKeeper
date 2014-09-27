@@ -1,10 +1,10 @@
 #ifndef DELETEDIALOGUE_H
 #define DELETEDIALOGUE_H
 
-#include <QWidget>
-#include <memory>
+#include "QWidget"
+#include "memory"
 #include "note.h"
-#include "QTreeWidgetItem"
+#include "notetreeitem.h"
 
 namespace Ui {
 class DeleteDialogue;

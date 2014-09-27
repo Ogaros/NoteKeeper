@@ -25,7 +25,8 @@ void DeleteDialogue::setupList()
     int index = 0;
     for(auto note : *notes)
     {
-        QTreeWidgetItem *item = new QTreeWidgetItem(list);
+        std::shared_ptr<Settings> settings;
+        NoteTreeItem *item = new NoteTreeItem(settings);
         setupItem(note, item);
         item->setText(10, QString::number(index));
         list->addTopLevelItem(item);
