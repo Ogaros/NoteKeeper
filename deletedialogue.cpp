@@ -10,7 +10,6 @@ DeleteDialogue::DeleteDialogue(std::unique_ptr<QList<Note*>> notes, QWidget *par
     this->notes = std::move(notes);
     setupList();
     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(sendDeleteList()));
-    connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
@@ -68,11 +67,39 @@ void DeleteDialogue::setupItem(Note *note, QTreeWidgetItem *item)
 
 void DeleteDialogue::sendDeleteList()
 {
-    auto itemList = ui->noteList->selectedItems();
-    QList<Note*> *noteList = new QList<Note*>;
-    for(auto item : itemList)
+    auto itemList = ui->noteList->selectedItems();    
+    int size = itemList.size();
+    if(size == 0)
     {
-        noteList->append(indexMap[item->text(10).toInt()]);
+        QMessageBox::warning(this, "No notes selected", "Select one or more notes to delete", QMessageBox::Ok);
+        ui->noteList->setFocus();
     }
-    emit deleteNotes(std::shared_ptr<QList<Note*>>(noteList));
+    else if(showConfirmation(size == 1) == QMessageBox::Yes)
+    {
+        QList<Note*> *noteList = new QList<Note*>;
+        for(auto item : itemList)
+        {
+            noteList->append(indexMap[item->text(10).toInt()]);
+        }
+        emit deleteNotes(std::shared_ptr<QList<Note*>>(noteList));
+        close();
+    }
+    else
+        ui->noteList->setFocus();
+}
+
+int DeleteDialogue::showConfirmation(bool isSingle)
+{
+    QString title, text;
+    if(isSingle)
+    {
+        title = "Delete note?";
+        text = "Are you sure you want to delete selected note?";
+    }
+    else
+    {
+        title = "Delete notes?";
+        text = "Are you sure you want to delete selected notes?";
+    }
+    return QMessageBox::question(this, title, text, QMessageBox::Yes, QMessageBox::No);
 }

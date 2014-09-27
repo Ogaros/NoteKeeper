@@ -96,14 +96,31 @@ void NoteListWindow::edit()
 {
     ui->treeWidget->setFocus();
     QTreeWidgetItem *item = ui->treeWidget->currentItem();
-    if(item != nullptr)
+    if(ui->treeWidget->selectedItems().size() == 0)
+    {
+        QMessageBox::warning(this, "No notes selected", "Select a note to edit", QMessageBox::Ok);
+        ui->treeWidget->setFocus();
+    }
+    else
         emit editNote(indexMap[item->text(10).toInt()]);
 }
 
 void NoteListWindow::remove()
 {
     ui->treeWidget->setFocus();
-    QTreeWidgetItem *item = ui->treeWidget->currentItem();
-    if(item != nullptr)
+    QTreeWidgetItem *item = ui->treeWidget->currentItem();    
+    if(ui->treeWidget->selectedItems().size() == 0)
+    {
+        QMessageBox::warning(this, "No notes selected", "Select a note to delete", QMessageBox::Ok);
+        ui->treeWidget->setFocus();
+    }
+    else if(showConfirmation() == QMessageBox::Yes)
         emit deleteNote(indexMap[item->text(10).toInt()]);
+    else
+        ui->treeWidget->setFocus();
+}
+
+int NoteListWindow::showConfirmation()
+{
+    return QMessageBox::question(this, "Delete note?",  "Are you sure you want to delete selected note?", QMessageBox::Yes, QMessageBox::No);
 }

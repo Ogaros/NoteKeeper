@@ -24,6 +24,7 @@ private:
     void setConnections();
     void setupList();
     void setupItem(Note *, QTreeWidgetItem *);
+    int showConfirmation();
     Ui::NoteListWindow *ui;
     std::shared_ptr<Notebook> notes;
     std::shared_ptr<Settings> settings;
