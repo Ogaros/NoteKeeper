@@ -15,42 +15,24 @@ public:
     Notebook(const std::weak_ptr<Settings>);
     ~Notebook();
     void loadNotes();
-    void saveNotes();
-    void addNote(Note *n);
-    void addNote(const QDate date, const QString text, const nFrequency frequency,
-                 const bool notifEnabled, const int daysPrior);
-    bool deleteNote(Note *n);
-    int deleteOutdated(const QDate&);
+    void saveNotes() const;
+    void addNote(Note * const note);
+    bool deleteNote(Note * const note);
+    int deleteOutdated(const QDate &date);
     int deleteAll();
-    std::unique_ptr<QList<Note*>> getNotesFromDate(const QDate&) const;
-    std::unique_ptr<QList<Note*>> getNotificationsFromDate(const QDate&) const;
-    Note* findClosest(const QDate&) const;
-    int contains (const QDate&) const;
-    void sort();
+    int contains (const QDate &date) const;
+    Note* findClosest(const QDate &date) const;
+    std::unique_ptr<QList<Note*>> getNotesFromDate(const QDate &date) const;
+    std::unique_ptr<QList<Note*>> getNotificationsFromDate(const QDate &date) const;
 
 private:
-    const QString filePath = QApplication::applicationDirPath() + "/OrgNotes.xml";
-    bool noteOnDate(Note* const, const QDate&) const;
-    bool notificationOnDate(Note* const note, const QDate&date) const;
-    QDate closestDate(Note* const note, const QDate&date) const;
+    const QString filePath = QApplication::applicationDirPath() + "/Notes.xml";
     QList<Note*> notes;
     std::shared_ptr<Settings> settings;
+    bool noteOnDate(Note * const note, const QDate &date) const;
+    bool notificationOnDate(Note * const note, const QDate &date) const;
+    QDate getClosestDate(Note * const note, const QDate &date) const;
     Note* parseNote(QXmlStreamReader&) const;
-
-    struct ptrLess
-    {
-        bool operator()(const Note *a, const Note *b)
-        {
-            if(a != nullptr && b != nullptr)
-            {
-                return *a < *b;
-            }
-            else
-            {
-                throw std::runtime_error("Null pointer passed as an argument");
-            }
-        }
-    };
 };
 
 #endif // NOTEBOOK_H

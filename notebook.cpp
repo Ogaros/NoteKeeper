@@ -18,23 +18,9 @@ Notebook::~Notebook()
     deleteAll();
 }
 
-void Notebook::addNote(Note *n)
+void Notebook::addNote(Note * const note)
 {
-    notes.append(n);
-    try
-    {
-        sort();
-    }
-    catch(...)
-    {
-        throw;
-    }
-}
-void Notebook::addNote(const QDate date, const QString text, const nFrequency frequency,
-                       const bool notifEnabled, const int daysPrior)
-{
-    Note *n = new Note(date, text, frequency, notifEnabled, daysPrior);
-    addNote(n);
+    notes.append(note);
 }
 
 void Notebook::loadNotes()
@@ -110,16 +96,8 @@ Note* Notebook::parseNote(QXmlStreamReader &xml) const
     return n;
 }
 
-void Notebook::saveNotes()
+void Notebook::saveNotes() const
 {
-    try
-    {
-        sort();
-    }
-    catch(...)
-    {
-        throw;
-    }
     QFile file(filePath);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
         throw std::runtime_error("Failed to open OrgNotes.xml");
@@ -146,18 +124,6 @@ void Notebook::saveNotes()
     file.close();
 }
 
-void Notebook::sort()
-{
-    try
-    {
-        std::stable_sort(notes.begin(), notes.end(), ptrLess());
-    }
-    catch(...)
-    {
-        throw;
-    }
-}
-
 std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate & date) const
 {
     std::unique_ptr<QList<Note*>> list(new QList<Note*>);
@@ -173,6 +139,7 @@ std::unique_ptr<QList<Note*>> Notebook::getNotesFromDate(const QDate & date) con
 
 std::unique_ptr<QList<Note*>> Notebook::getNotificationsFromDate(const QDate & date) const
 {
+    // Returns notes that are up for notification popup at the date.
     std::unique_ptr<QList<Note*>> list(new QList<Note*>);
     for(auto note : notes)
     {
@@ -210,7 +177,7 @@ bool Notebook::noteOnDate(Note * const note, const QDate & date) const
             (
                 (settings->rDisplay == Settings::All) ||
                 (settings->rDisplay == Settings::Future && (date >= QDate::currentDate() || note->frequency == nFrequency::Once)) ||
-                (settings->rDisplay == Settings::Closest && date == closestDate(note, QDate::currentDate()))
+                (settings->rDisplay == Settings::Closest && date == getClosestDate(note, QDate::currentDate()))
             )
       )
         return true;
@@ -230,14 +197,14 @@ bool Notebook::notificationOnDate(Note * const note, const QDate & date) const
         }
         else
         {
-            note->date = closestDate(note, date);
+            note->date = getClosestDate(note, date);
             return showNotification(note->date);
         }
     }
     return false;
 }
 
-QDate Notebook::closestDate(Note * const note, const QDate &date) const
+QDate Notebook::getClosestDate(Note * const note, const QDate &date) const
 {
     if(note->frequency == nFrequency::Once)
     {
@@ -318,11 +285,26 @@ int Notebook::deleteOutdated(const QDate &date)
 
 Note* Notebook::findClosest(const QDate &date) const
 {
+    Note *cNote = nullptr;
+    QDate cDate;
     for(auto note : notes)
-    {
-        if(note->date > date)
-            return note;
+    {        
+        QDate cDateOther = getClosestDate(note, date);
+        if(cDateOther >= date)
+        {
+            if(cNote == nullptr)
+            {
+                cNote = note;
+                cDate = cDateOther;
+            }
+            else
+                if(cDate > cDateOther)
+                {
+                    cNote = note;
+                    cDate = cDateOther;
+                }
+        }
     }
-    return nullptr;
+    return cNote;
 }
 
