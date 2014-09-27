@@ -5,9 +5,9 @@ Calendar::Calendar(const std::weak_ptr<Notebook> notes, const std::weak_ptr<Sett
 {
     this->notes = notes.lock();    
     this->settings = settings.lock();
-    this->setFirstDayOfWeek(Qt::Monday);
-    this->setGridVisible(true);
-    this->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+    setFirstDayOfWeek(Qt::Monday);
+    setGridVisible(true);
+    setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 }
 
 void Calendar::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const

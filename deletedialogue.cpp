@@ -34,7 +34,7 @@ void DeleteDialogue::setupList()
     list->sortItems(10, Qt::AscendingOrder);
 }
 
-void DeleteDialogue::setupItem(Note *note, QTreeWidgetItem *item)
+void DeleteDialogue::setupItem(Note * const note, QTreeWidgetItem * const item) const
 {
     item->setText(0, note->text);
     QString frequency;

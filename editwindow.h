@@ -1,7 +1,6 @@
 #ifndef EDITWINDOW_H
 #define EDITWINDOW_H
 
-#include "widgetList.h"
 #include "note.h"
 #include "QRegExpValidator"
 #include "memory"
@@ -12,14 +11,14 @@ class EditWindow : public QWidget
     Q_OBJECT
 public:
     explicit EditWindow(std::weak_ptr<Settings>, QWidget *parent = 0);
-    void loadNotes(const QDate&, std::unique_ptr<QList<Note*>>);
-    void loadNote(Note *);
+    void loadNotes(const QDate &date, std::unique_ptr<QList<Note*>> list);
+    void loadNote(Note * const note);
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 signals:
-    void noteAdded(Note*);
+    void noteAdded(Note * const note);
     void noteEdited();
 
 public slots:    
@@ -40,10 +39,11 @@ private:
     void resizeTimer();
 
     std::shared_ptr<Settings>       settings;
-    Note                *currentNote;
-    QDate               currentDate;
-    std::unique_ptr<QList<Note*>> noteList;
+    Note                            *currentNote;
+    QDate                           currentDate;
+    std::unique_ptr<QList<Note*>>   noteList;
 
+    // Inteface
     QVBoxLayout         *mainLayout;
     QLabel              *dateLabel;
     QDateEdit           *selectedDate;

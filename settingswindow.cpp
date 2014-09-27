@@ -44,7 +44,7 @@ void SettingsWindow::closeEvent(QCloseEvent *event)
 void SettingsWindow::setConnections() const
 {
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonsClicked(QAbstractButton*)));
-    connect(ui->dateFormatEdit, SIGNAL(textEdited(QString)), this, SLOT(formatChanged(QString)));
+    connect(ui->dateFormatEdit, SIGNAL(textEdited(QString)), this, SLOT(extraY(QString)));
 }
 
 void SettingsWindow::buttonsClicked(QAbstractButton *button)
@@ -71,7 +71,7 @@ void SettingsWindow::loadSettings()
     loadSettings(settings.get());
 }
 
-void SettingsWindow::loadSettings(Settings *l_settings)
+void SettingsWindow::loadSettings(Settings * const l_settings)
 {
     ui->dateFormatEdit->setText(l_settings->dateFormat);
     ui->startupCheckBox->setChecked(l_settings->autorun);
@@ -114,8 +114,9 @@ void SettingsWindow::saveSettings()
     settings->save();
 }
 
-void SettingsWindow::formatChanged(QString newFormat)
+void SettingsWindow::extraY(QString newFormat)
 {
+    // Adds/removes an extra 'y' when user adds/removes 'y' to/from the date format field.
     int index = strDiff(prevFormat, newFormat);
     if(index < 0)
     {
@@ -148,8 +149,10 @@ void SettingsWindow::formatChanged(QString newFormat)
     prevFormat = newFormat;
 }
 
-int SettingsWindow::strDiff(QString &first, QString &second)
+int SettingsWindow::strDiff(const QString &first, const QString &second) const
 {
+    // Compares 2 strings and returns an index of the first different character.
+    // Returns -1 if strings are equal.
     int fSize = first.size();
     int sSize = second.size();
     int size = fSize < sSize ? fSize : sSize;

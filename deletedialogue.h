@@ -26,7 +26,7 @@ private slots:
 
 private:
     void setupList();
-    void setupItem(Note*, QTreeWidgetItem*);
+    void setupItem(Note * const note, QTreeWidgetItem * const item) const;
     int showConfirmation(bool isSingle);
     Ui::DeleteDialogue *ui;
     std::unique_ptr<QList<Note*>> notes;

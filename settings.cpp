@@ -13,7 +13,7 @@ void Settings::restore()
     showNumber = false;
 }
 
-void Settings::save()
+void Settings::save() const
 {
     QSettings settings(filePath, QSettings::IniFormat);
     settings.setValue("Autorun", autorun);

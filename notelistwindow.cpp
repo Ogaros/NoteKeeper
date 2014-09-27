@@ -60,7 +60,7 @@ void NoteListWindow::deleteItem()
     delete ui->treeWidget->takeTopLevelItem(index);
 }
 
-void NoteListWindow::setupItem(Note *note, QTreeWidgetItem *item)
+void NoteListWindow::setupItem(Note * const note, QTreeWidgetItem * const item) const
 {
     item->setText(0, note->date.toString(settings->dateFormat));
     item->setText(1, note->text);

@@ -1,7 +1,7 @@
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
 
-#include <QWidget>
+#include "QWidget"
 #include "QCloseEvent"
 #include "QAbstractButton"
 #include "settings.h"
@@ -20,14 +20,14 @@ public:
     explicit SettingsWindow(const std::weak_ptr<Settings>, QWidget *parent = 0);
     ~SettingsWindow();    
     void loadSettings();
-    void loadSettings(Settings *l_settings);
+    void loadSettings(Settings * const l_settings);
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void buttonsClicked(QAbstractButton*);
-    void formatChanged(QString);
+    void buttonsClicked(QAbstractButton *button);
+    void extraY(QString newFormat);
 
 signals:
     void dateFormatChanged();
@@ -36,7 +36,7 @@ signals:
 private:
     void setConnections() const;
     void saveSettings();
-    int strDiff(QString&, QString&);
+    int strDiff(const QString &first, const QString &second) const;
     Ui::SettingsWindow *ui;
     std::shared_ptr<Settings> settings;    
     QString prevFormat;

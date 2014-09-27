@@ -239,7 +239,7 @@ void EditWindow::addNote()
     }
 }
 
-void EditWindow::loadNotes(const QDate& date, std::unique_ptr<QList<Note*>> list)
+void EditWindow::loadNotes(const QDate &date, std::unique_ptr<QList<Note*>> list)
 {
     currentDate = date;
     noteList.reset(list.release());
@@ -276,7 +276,7 @@ void EditWindow::loadNotes(const QDate& date, std::unique_ptr<QList<Note*>> list
     }
 }
 
-void EditWindow::loadNote(Note *note)
+void EditWindow::loadNote(Note * const note)
 {
     noteSelectorLabel->hide();
     noteSelectorComboBox->hide();

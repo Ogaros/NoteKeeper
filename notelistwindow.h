@@ -20,27 +20,27 @@ public:
     explicit NoteListWindow(const std::weak_ptr<Notebook>, const std::weak_ptr<Settings>, QWidget *parent = 0);
     ~NoteListWindow();
 
+public slots:
+    void updateItem();
+    void deleteItem();
+
+signals:
+    void editNote(Note * const note);
+    void deleteNote(Note * const note);
+
 private:
     void setConnections();
     void setupList();
-    void setupItem(Note *, QTreeWidgetItem *);
+    void setupItem(Note * const note, QTreeWidgetItem * const item) const;
     int showConfirmation();
     Ui::NoteListWindow *ui;
     std::shared_ptr<Notebook> notes;
     std::shared_ptr<Settings> settings;
     std::map<int, Note*> indexMap;    
 
-public slots:
-    void updateItem();
-    void deleteItem();
-
 private slots:
     void edit();
     void remove();
-
-signals:
-    void editNote(Note *);
-    void deleteNote(Note *);
 };
 
 #endif // NOTELISTWINDOW_H

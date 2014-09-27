@@ -14,22 +14,22 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     catch(std::exception& e)
     {
-        QMessageBox::critical(parent, "MainWindow::MainWindow", QString::fromLocal8Bit(e.what()));
+        QMessageBox::critical(parent, "MainWindow::MainWindow", e.what());
     }
     this->setUI();
     showTrayMessage();
 }
 
-void MainWindow::showEditWindow(Note *note)
+void MainWindow::openEditWindow(Note *note)
 {
     EditWindow *window = new EditWindow(settings);
     window->setWindowFlags(window->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
     window->setWindowModality(Qt::ApplicationModal);
     window->setAttribute(Qt::WA_DeleteOnClose);
-    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(addNote(Note*)));
-    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(showNotes()));
-    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(showClosestNote()));
-    connect(window, SIGNAL(noteAdded(Note*)), this, SLOT(switchButtons()));
+    connect(window, SIGNAL(noteAdded(Note*const)), this, SLOT(addNote(Note*const)));
+    connect(window, SIGNAL(noteAdded(Note*const)), this, SLOT(showNotes()));
+    connect(window, SIGNAL(noteAdded(Note*const)), this, SLOT(showClosestNote()));
+    connect(window, SIGNAL(noteAdded(Note*const)), this, SLOT(switchButtons()));
     connect(window, SIGNAL(noteEdited()), this, SIGNAL(noteEdited()));
     const QDate d = cal->selectedDate();
     if(QObject::sender() == addButton)
@@ -45,7 +45,6 @@ void MainWindow::showEditWindow(Note *note)
         window->loadNote(note);
     }
     window->show();
-    window->activateWindow();
     moveToCenter(window);
 }
 
@@ -95,7 +94,7 @@ void MainWindow::createMenu()
     QMenu *helpMenu = menu->addMenu("Help");
 
     QList<QAction *> fileActions;
-    fileActions.append(new QAction("Save notes",this));
+    fileActions.append(new QAction("Save",this));
     fileActions.back()->setShortcut(Qt::CTRL | Qt::Key_S);
     fileActions.append(new QAction("Show all notes...",this));
     fileActions.append(new QAction("Delete outdated notes",this));
@@ -103,10 +102,10 @@ void MainWindow::createMenu()
     QAction *settings = new QAction("Settings...", this);
 
     connect(fileActions.front(), SIGNAL(triggered()), this, SLOT(saveNotes()));
-    connect(fileActions.at(1), SIGNAL(triggered()), this, SLOT(showAllNotesWindow()));
+    connect(fileActions.at(1), SIGNAL(triggered()), this, SLOT(openAllNotesWindow()));
     connect(fileActions.at(2), SIGNAL(triggered()), this, SLOT(deleteOutdated()));
     connect(fileActions.at(3), SIGNAL(triggered()), this, SLOT(deleteAll()));
-    connect(settings, SIGNAL(triggered()), this, SLOT(showSettingsWindow()));
+    connect(settings, SIGNAL(triggered()), this, SLOT(openSettingsWindow()));
 
     fileMenu->addActions(fileActions);
     fileMenu->addSeparator();
@@ -115,7 +114,7 @@ void MainWindow::createMenu()
     QAction *aboutAction = new QAction("About...",this);
     helpMenu->addAction(aboutAction);
 
-    connect(aboutAction, SIGNAL(triggered()), this, SLOT(showAbout()));
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(openAboutWindow()));
 
     connect(this, SIGNAL(noteDeleted()), this, SLOT(showClosestNote()));
 
@@ -171,9 +170,9 @@ void MainWindow::createButtonLayout()
     todayButton = new QPushButton("Go to current date");
     quitButton = new QPushButton("Close");
 
-    connect(addButton, SIGNAL(clicked()), this, SLOT(showEditWindow()));
-    connect(editButton, SIGNAL(clicked()), this, SLOT(showEditWindow()));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(deleteNoteDialogue()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(openEditWindow()));
+    connect(editButton, SIGNAL(clicked()), this, SLOT(openEditWindow()));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(openDeleteDialogue()));
     connect(todayButton, SIGNAL(clicked()), cal, SLOT(showToday()));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(close()));
 
@@ -213,7 +212,7 @@ void MainWindow::createCalendar()
 
 }
 
-void MainWindow::moveToCenter(QWidget *window)
+void MainWindow::moveToCenter(QWidget * const window)
 {
     QDesktopWidget *d = QApplication::desktop();
     int ww = window->width();
@@ -223,16 +222,9 @@ void MainWindow::moveToCenter(QWidget *window)
     window->move(dw/2 - ww/2, dh/2 - wh/2);
 }
 
-void MainWindow::addNote(Note *n)
+void MainWindow::addNote(Note * const note)
 {
-    try
-    {
-        notes->addNote(n);
-    }
-    catch(std::exception& e)
-    {
-        QMessageBox::critical(this, "Notebook::addNote", QString::fromLocal8Bit(e.what()));
-    }
+    notes->addNote(note);
     isChanged = true;
 }
 
@@ -341,8 +333,8 @@ void MainWindow::saveNotes()
     isChanged = false;
 }
 
-void MainWindow::deleteNoteDialogue()
-{
+void MainWindow::openDeleteDialogue()
+{    
     auto list = std::move(notes->getNotesFromDate(cal->selectedDate()));
     if(list->size() == 1)
     {
@@ -363,7 +355,7 @@ void MainWindow::deleteNoteDialogue()
     cal->setFocus();
 }
 
-void MainWindow::deleteNoteFromListWindow(Note *note)
+void MainWindow::deleteNoteFromListWindow(Note * const note)
 {
     if(showDeleteMessageBox(DeleteOption::One) == QMessageBox::Yes)
     {
@@ -371,7 +363,7 @@ void MainWindow::deleteNoteFromListWindow(Note *note)
     }
 }
 
-void MainWindow::deleteNote(Note * note)
+void MainWindow::deleteNote(Note * const note)
 {
     notes->deleteNote(note);
     this->showNotes();
@@ -436,12 +428,7 @@ int MainWindow::showDeleteMessageBox(const DeleteOption op)
     default:
         break;
     }
-    QMessageBox mb(this);
-    mb.setWindowTitle(title);
-    mb.setText(text);
-    mb.setIcon(QMessageBox::Question);
-    mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    return mb.exec();
+    return QMessageBox::question(this, title, text, QMessageBox::Yes, QMessageBox::No);
 }
 int MainWindow::showExitWOSavingMessageBox()
 {
@@ -597,7 +584,7 @@ void MainWindow::showTrayMessage()
     }
 }
 
-void MainWindow::showSettingsWindow()
+void MainWindow::openSettingsWindow()
 {
     SettingsWindow *window = new SettingsWindow(settings);
     window->setWindowFlags(window->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
@@ -610,7 +597,7 @@ void MainWindow::showSettingsWindow()
     window->show();
 }
 
-void MainWindow::showAbout()
+void MainWindow::openAboutWindow()
 {
     QWidget *about = new QWidget;
     QLabel *icon = new QLabel;
@@ -640,12 +627,12 @@ void MainWindow::showAbout()
     about->move(ww/2 - aw/2 + this->x(), wh/2 - ah/2 + this->y());
 }
 
-void MainWindow::showAllNotesWindow()
+void MainWindow::openAllNotesWindow()
 {
     NoteListWindow *window = new NoteListWindow(notes, settings);
     window->setAttribute(Qt::WA_DeleteOnClose);
-    connect(window, SIGNAL(editNote(Note*)), this, SLOT(showEditWindow(Note*)));
-    connect(window, SIGNAL(deleteNote(Note*)), this, SLOT(deleteNote(Note*)));
+    connect(window, SIGNAL(editNote(Note*const)), this, SLOT(openEditWindow(Note*const)));
+    connect(window, SIGNAL(deleteNote(Note*const)), this, SLOT(deleteNote(Note*const)));
     connect(this, SIGNAL(noteDeleted()), window, SLOT(deleteItem()));
     connect(this, SIGNAL(noteEdited()), window, SLOT(updateItem()));
     window->show();
