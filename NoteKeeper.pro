@@ -4,7 +4,6 @@ HEADERS += \
     mainwindow.h \
     main.h \
     calendar.h \
-    widgetList.h \
     note.h \
     notebook.h \
     editwindow.h \
@@ -12,13 +11,13 @@ HEADERS += \
     settingswindow.h \
     settings.h \
     notelistwindow.h \
-    notetreeitem.h
+    notetreeitem.h \
+    widgetList.h
 
 SOURCES += \
     mainwindow.cpp \
     main.cpp \
     calendar.cpp \
-    note.cpp \
     notebook.cpp \
     editwindow.cpp \
     deletedialogue.cpp \
