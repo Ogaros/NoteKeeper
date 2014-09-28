@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     showTrayMessage();
 }
 
-void MainWindow::openEditWindow(Note *note)
+void MainWindow::openEditWindow(Note * const note)
 {
     EditWindow *window = new EditWindow(settings);
     window->setWindowFlags(window->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
@@ -46,6 +46,7 @@ void MainWindow::openEditWindow(Note *note)
     }
     window->show();
     moveToCenter(window);
+    cal->setFocus();
 }
 
 void MainWindow::setUI()

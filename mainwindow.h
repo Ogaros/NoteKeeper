@@ -28,7 +28,7 @@ public slots:
     void openAllNotesWindow();
     void openAboutWindow();
     void openDeleteDialogue();
-    int  showDeleteMessageBox(const DeleteOption);
+    int  showDeleteMessageBox(const DeleteOption op);
     void showNotes();
     void showClosestNote();
     void addNote(Note * const note);
