@@ -22,9 +22,6 @@ public:
     void loadSettings();
     void loadSettings(Settings * const l_settings);
 
-protected:
-    void closeEvent(QCloseEvent *event);
-
 private slots:
     void buttonsClicked(QAbstractButton *button);
     void extraY(QString newFormat);

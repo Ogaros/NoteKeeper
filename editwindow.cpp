@@ -8,12 +8,6 @@ EditWindow::EditWindow(std::weak_ptr<Settings> settings, QWidget *parent) :
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-void EditWindow::closeEvent(QCloseEvent *event)
-{
-    event->ignore();
-    this->hide();
-}
-
 void EditWindow::setUI()
 {
     mainLayout = new QVBoxLayout;

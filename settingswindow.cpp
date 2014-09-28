@@ -35,12 +35,6 @@ SettingsWindow::~SettingsWindow()
     delete ui;
 }
 
-void SettingsWindow::closeEvent(QCloseEvent *event)
-{
-    event->ignore();
-    this->hide();
-}
-
 void SettingsWindow::setConnections() const
 {
     connect(ui->buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonsClicked(QAbstractButton*)));

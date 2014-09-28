@@ -14,9 +14,6 @@ public:
     void loadNotes(const QDate &date, std::unique_ptr<QList<Note*>> list);
     void loadNote(Note * const note);
 
-protected:
-    void closeEvent(QCloseEvent *event);
-
 signals:
     void noteAdded(Note * const note);
     void noteEdited();
