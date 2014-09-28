@@ -220,10 +220,10 @@ QDate Notebook::getClosestDate(Note * const note, const QDate &date) const
         else
             next = [](QDate &d, int &sign){return d.addYears(sign * 1);};
         int sign = note->date > date ? -1 : 1;
-        QDate closestDate = note->date;
-        QDate tempDate = next(closestDate, sign);
+        QDate closestDate = note->date;        
         if(note->date > date)
         {
+            QDate tempDate = next(closestDate, sign);
             while(tempDate >= date)
             {
                 closestDate = tempDate;
@@ -232,11 +232,10 @@ QDate Notebook::getClosestDate(Note * const note, const QDate &date) const
         }
         else
         {
-            while(tempDate < date)
+            while(closestDate < date)
             {
-                tempDate = next(tempDate, sign);
-            }
-            closestDate = tempDate;
+                closestDate = next(closestDate, sign);
+            }            
         }
         return closestDate;
     }
