@@ -9,6 +9,9 @@ DeleteDialogue::DeleteDialogue(std::unique_ptr<QList<Note*>> notes, QWidget *par
     ui->noteList->header()->setSectionsMovable(false);
     this->notes = std::move(notes);
     setupList();
+    ui->noteList->resizeColumnToContents(0);
+    ui->noteList->setStyleSheet("QTreeWidget {alternate-background-color: #dfdfdf;}");
+    this->resize(this->sizeHint().width(), this->height());
     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(sendDeleteList()));
     connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
 }

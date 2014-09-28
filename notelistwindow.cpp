@@ -19,6 +19,9 @@ NoteListWindow::NoteListWindow(const std::weak_ptr<Notebook> notes, const std::w
         QMessageBox::critical(this, "NoteListWindow::NoteListWindow", e.what(), QMessageBox::Close);
         qApp->quit();
     }
+    ui->treeWidget->resizeColumnToContents(1);
+    ui->treeWidget->setStyleSheet("QTreeWidget {alternate-background-color: #dfdfdf;}");
+    this->resize(this->sizeHint().width(), this->height());
     setConnections();
 }
 

@@ -52,6 +52,9 @@
    </item>
    <item>
     <widget class="QTreeWidget" name="noteList">
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+     </property>
      <property name="showDropIndicator" stdset="0">
       <bool>true</bool>
      </property>
@@ -60,6 +63,9 @@
      </property>
      <property name="selectionMode">
       <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
      <property name="sortingEnabled">
       <bool>true</bool>
