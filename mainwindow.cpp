@@ -31,6 +31,9 @@ void MainWindow::openEditWindow(Note * const note)
     connect(window, SIGNAL(noteAdded(Note*const)), this, SLOT(showClosestNote()));
     connect(window, SIGNAL(noteAdded(Note*const)), this, SLOT(switchButtons()));
     connect(window, SIGNAL(noteEdited()), this, SIGNAL(noteEdited()));
+    connect(window, SIGNAL(noteEdited()), this, SLOT(showNotes()));
+    connect(window, SIGNAL(noteEdited()), this, SLOT(showClosestNote()));
+    connect(window, SIGNAL(noteEdited()), this, SLOT(setChanged()));
     const QDate d = cal->selectedDate();
     if(QObject::sender() == addButton)
     {
@@ -238,7 +241,7 @@ void MainWindow::showNotes()
     int labelsSize = noteLabels.size();
     if(notesCount != 0)
     {
-        noteTextTitle->setText(d.toString(settings->dateFormat + ":"));
+        noteTextTitle->setText(d.toString(settings->dateFormat) + ": ("+QString::number(notesCount)+")");
         while(notesCount > labelsSize)
         {
             addNoteLabel();
@@ -637,4 +640,9 @@ void MainWindow::openAllNotesWindow()
     connect(this, SIGNAL(noteDeleted()), window, SLOT(deleteItem()));
     connect(this, SIGNAL(noteEdited()), window, SLOT(updateItem()));
     window->show();
+}
+
+void MainWindow::setChanged()
+{
+    isChanged = true;
 }

@@ -36,6 +36,7 @@ public slots:
     void deleteNoteFromListWindow(Note * const note);
     void deleteAll();
     void deleteOutdated();
+    void setChanged();
     int  showExitWOSavingMessageBox();
 
 protected:
