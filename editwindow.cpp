@@ -381,8 +381,10 @@ void EditWindow::refreshNotificationStartDate()
             }
             else
             {
-                days += days.toInt() == 1 ? " day" : " days";
-                notificationDaysRadioButton->setText(days + " prior to date " + selectedDate->date().addDays(-days.toInt()).toString("("+settings->dateFormat+")"));
+                int d = days.toInt();
+                QDate date = selectedDate->date().addDays(-d);
+                days += d == 1 ? " day" : " days";
+                notificationDaysRadioButton->setText(days + " prior to date " + date.toString("("+settings->dateFormat+")"));
             }
         }
         else
